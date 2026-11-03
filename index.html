@@ -2,142 +2,212 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101018">
 <title>SESMOD AI STUDIO</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#29233d 0,#101018 55%);color:#f7f5ff;font-family:system-ui,sans-serif;display:grid;place-items:center;padding:22px}
-.wrap{width:100%;max-width:420px}
-.brand{text-align:center;margin-bottom:26px}
-.mark{width:58px;height:58px;margin:0 auto 12px;border:1px solid #8c72ff;border-radius:18px;display:grid;place-items:center;color:#c7baff;font-size:25px;font-weight:800}
-.brand h1{font-size:25px;letter-spacing:3px;margin:0}
-.brand p{color:#aaa5bb;margin:7px 0 0;font-size:13px;letter-spacing:2px}
-.panel{background:#191923;border:1px solid #343142;border-radius:22px;padding:25px}
-.tabs{display:flex;background:#101018;border-radius:12px;padding:4px;margin-bottom:22px}
-.tabs button{flex:1;border:0;background:transparent;color:#aaa5bb;padding:11px;border-radius:9px}
-.tabs button.active{background:#7658e8;color:white;font-weight:700}
-label{display:block;font-size:13px;color:#c9c5d6;margin:15px 0 7px}
-input{width:100%;padding:14px;border:1px solid #3c394b;border-radius:11px;background:#101018;color:white;font-size:16px}
-.primary{width:100%;border:0;border-radius:11px;padding:15px;margin-top:22px;background:linear-gradient(100deg,#7555e8,#a05eea);color:white;font-size:15px;font-weight:750}
-.primary:disabled{opacity:.6}
-.hint{font-size:12px;color:#aaa5bb;text-align:center;line-height:1.6;margin-top:17px}
-.message{font-size:13px;line-height:1.5;margin-top:14px;color:#c9baff;min-height:18px}
+body{margin:0;background:#101018;color:#f7f5ff;font-family:system-ui,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+header{padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #302c40}
+.logo{font-size:21px;font-weight:900;letter-spacing:3px}
+.logo small{display:block;font-size:10px;color:#a78bfa;letter-spacing:4px}
+#auth{max-width:420px;margin:65px auto;padding:24px}
+#auth,#workspace{padding:20px}
+.panel{background:#1b1a27;border:1px solid #373248;border-radius:17px;padding:20px}
+input,textarea,select{width:100%;padding:13px;margin:8px 0 14px;background:#101018;color:white;border:1px solid #484158;border-radius:10px}
+button.primary{background:linear-gradient(100deg,#7655e8,#a05eea);color:white;border:0;border-radius:10px;padding:13px 18px;font-weight:700}
+button.secondary{background:#302a43;color:white;border:1px solid #554a70;border-radius:10px;padding:11px}
+.full{width:100%}
+.tabs{display:flex;gap:8px;margin:15px 0}
+.tabs button{flex:1}
+#workspace{max-width:950px;margin:auto}
+.welcome{padding:24px 4px}
+.welcome h1{font-size:27px;margin-bottom:5px}
+.muted{color:#aaa5bb;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tool{background:#1b1a27;border:1px solid #373248;border-radius:15px;padding:18px;text-align:left;color:white;min-height:120px}
+.tool b{display:block;margin:10px 0 5px;font-size:16px}
+.tool span{color:#aaa5bb;font-size:12px}
+.symbol{font-size:25px}
+#editor{margin-top:20px}
+#message{color:#c5b5ff;font-size:13px;min-height:20px;margin:10px 0}
+.project{border-bottom:1px solid #393348;padding:12px 0;font-size:14px}
 .hidden{display:none!important}
-.dashboard{text-align:center}
-.logout{margin-top:18px;padding:11px 20px;border:1px solid #51496c;border-radius:10px;background:transparent;color:white}
+footer{text-align:center;color:#777185;font-size:11px;padding:25px}
+@media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
-<main class="wrap">
-<header class="brand">
-<div class="mark">S</div>
-<h1>SESMOD</h1>
-<p>AI STUDIO</p>
+<header>
+<div class="logo">SESMOD<small>AI STUDIO</small></div>
+<button class="secondary hidden" id="logout">Çıkış Yap</button>
 </header>
 
-<section class="panel" id="authPanel">
+<section id="auth">
+<div class="panel">
+<h2>SESMOD hesabına giriş</h2>
 <div class="tabs">
-<button id="loginTab" class="active" type="button">Giriş Yap</button>
-<button id="signupTab" type="button">Hesap Oluştur</button>
+<button class="primary" id="loginTab">Giriş Yap</button>
+<button class="secondary" id="signupTab">Hesap Oluştur</button>
+</div>
+<form id="authForm">
+<label>E-posta</label>
+<input id="email" type="email" required placeholder="E-posta adresin">
+<label>Şifre</label>
+<input id="password" type="password" minlength="6" required placeholder="En az 6 karakter">
+<button class="primary full" id="submit">Giriş Yap</button>
+</form>
+<div id="message"></div>
+</div>
+</section>
+
+<main id="workspace" class="hidden">
+<div class="welcome">
+<p class="muted">YARATICI ÜRETİM MERKEZİ</p>
+<h1>Üretmeye başla.</h1>
+<p class="muted" id="welcomeEmail"></p>
 </div>
 
-<form id="authForm">
-<label for="email">E-posta</label>
-<input id="email" type="email" autocomplete="email" placeholder="ornek@mail.com" required>
-<label for="password">Şifre</label>
-<input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="En az 6 karakter" required>
-<button class="primary" id="submitBtn" type="submit">Giriş Yap</button>
-</form>
+<h3>Yapay zekâ araçları</h3>
+<div class="grid">
+<button class="tool" onclick="openTool('music')">
+<div class="symbol">🎵</div><b>AI Müzik</b>
+<span>Şarkı ve müzik üretimi</span>
+</button>
+<button class="tool" onclick="openTool('lyrics')">
+<div class="symbol">✍️</div><b>AI Şarkı Yazarı</b>
+<span>Özgün söz ve türkü yazımı</span>
+</button>
+<button class="tool" onclick="openTool('image')">
+<div class="symbol">🎨</div><b>AI Görsel</b>
+<span>Kapak ve afiş üretimi</span>
+</button>
+<button class="tool" onclick="openTool('video')">
+<div class="symbol">🎬</div><b>AI Video</b>
+<span>Klip ve kısa film üretimi</span>
+</button>
+<button class="tool" onclick="openTool('projects')">
+<div class="symbol">📁</div><b>Projelerim</b>
+<span>Kaydedilen çalışmalar</span>
+</button>
+<button class="tool" onclick="openTool('account')">
+<div class="symbol">👤</div><b>Hesabım</b>
+<span>SESMOD hesap bilgileri</span>
+</button>
+</div>
 
-<div class="message" id="message" role="status"></div>
-<p class="hint">Tek SESMOD hesabı ile MUSIC ve AI STUDIO uygulamalarına erişim.</p>
+<section id="editor" class="panel hidden">
+<h2 id="toolTitle">AI STUDIO</h2>
+<p class="muted" id="toolDescription"></p>
+<div id="toolContent"></div>
+<div id="toolMessage"></div>
+<button class="secondary" onclick="closeTool()">← Ana panele dön</button>
 </section>
-
-<section class="panel dashboard hidden" id="appPanel">
-<h2>Hoş geldin!</h2>
-<p id="userEmail"></p>
-<p>SESMOD AI STUDIO hesabınla giriş yaptın.</p>
-<button class="logout" id="logoutBtn" type="button">Çıkış Yap</button>
-</section>
+<footer>SESMOD AI STUDIO © 2026</footer>
 </main>
 
 <script>
-const SUPABASE_URL="https://izlwpgepxyzzzsvfcuph.supabase.co";
-const SUPABASE_KEY="sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const URL="https://izlwpgepxyzzzsvfcuph.supabase.co";
+const KEY="sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
+const db=window.supabase.createClient(URL,KEY);
+let mode="login",currentUser=null;
 
-const form=document.getElementById("authForm");
-const message=document.getElementById("message");
-const loginTab=document.getElementById("loginTab");
-const signupTab=document.getElementById("signupTab");
-const submitBtn=document.getElementById("submitBtn");
-let mode="login";
-
-function setMode(next){
-mode=next;
-loginTab.classList.toggle("active",mode==="login");
-signupTab.classList.toggle("active",mode==="signup");
-submitBtn.textContent=mode==="login"?"Giriş Yap":"Hesap Oluştur";
-message.textContent="";
+const $=id=>document.getElementById(id);
+function msg(t){$("message").textContent=t}
+function showDashboard(user){
+currentUser=user;
+$("auth").classList.add("hidden");
+$("workspace").classList.remove("hidden");
+$("logout").classList.remove("hidden");
+$("welcomeEmail").textContent=user.email||"";
 }
-
-loginTab.onclick=()=>setMode("login");
-signupTab.onclick=()=>setMode("signup");
-
-function showApp(user){
-document.getElementById("authPanel").classList.add("hidden");
-document.getElementById("appPanel").classList.remove("hidden");
-document.getElementById("userEmail").textContent=user.email||"";
+function showLogin(){
+currentUser=null;
+$("workspace").classList.add("hidden");
+$("logout").classList.add("hidden");
+$("auth").classList.remove("hidden");
 }
+$("loginTab").onclick=()=>{mode="login";$("submit").textContent="Giriş Yap";msg("")};
+$("signupTab").onclick=()=>{mode="signup";$("submit").textContent="Hesap Oluştur";msg("")};
 
-function showAuth(){
-document.getElementById("appPanel").classList.add("hidden");
-document.getElementById("authPanel").classList.remove("hidden");
-}
-
-form.addEventListener("submit",async e=>{
+$("authForm").onsubmit=async e=>{
 e.preventDefault();
-submitBtn.disabled=true;
-message.textContent="İşleniyor…";
-const email=document.getElementById("email").value.trim();
-const password=document.getElementById("password").value;
-
+$("submit").disabled=true;
+msg("İşlem yapılıyor...");
 try{
-let result;
-if(mode==="signup"){
-result=await db.auth.signUp({email,password});
-}else{
-result=await db.auth.signInWithPassword({email,password});
-}
+const email=$("email").value.trim();
+const password=$("password").value;
+const result=mode==="signup"
+?await db.auth.signUp({email,password})
+:await db.auth.signInWithPassword({email,password});
 if(result.error)throw result.error;
-
 if(mode==="signup"&&!result.data.session){
-message.textContent="Kayıt oluşturuldu. E-postana gelen doğrulama bağlantısına tıkla, sonra giriş yap.";
-}else if(result.data.user){
-showApp(result.data.user);
-message.textContent="";
-}
-}catch(err){
-message.textContent=err.message||"Bir hata oluştu.";
-}finally{
-submitBtn.disabled=false;
-}
-});
-
-document.getElementById("logoutBtn").onclick=async()=>{
-await db.auth.signOut();
-showAuth();
+msg("Kayıt oluşturuldu. E-postanı doğrula, ardından giriş yap.");
+}else if(result.data.user){showDashboard(result.data.user)}
+}catch(err){msg(err.message)}
+finally{$("submit").disabled=false}
 };
 
+$("logout").onclick=async()=>{await db.auth.signOut();showLogin()};
 db.auth.getSession().then(({data})=>{
-if(data.session?.user)showApp(data.session.user);
+if(data.session?.user)showDashboard(data.session.user)
+});
+db.auth.onAuthStateChange((event,session)=>{
+if(event==="SIGNED_OUT")showLogin();
 });
 
-db.auth.onAuthStateChange((event,session)=>{
-if(event==="SIGNED_OUT"||!session)showAuth();
+const tools={
+music:["AI Müzik","Müzik üretim fikrini ve tarzını yaz.","Örnek: Duygusal modern arabesk, erkek vokal, klarnet ve gitar."],
+lyrics:["AI Şarkı Yazarı","Yazılmasını istediğin şarkının konusunu anlat.","Örnek: Gurbet, hasret ve memleket özlemi."],
+image:["AI Görsel","Oluşturmak istediğin görseli tarif et.","Örnek: Gece yağmur altında yalnız bir insan, sinematik albüm kapağı."],
+video:["AI Video","Oluşturmak istediğin videoyu tarif et.","Örnek: Duygusal bir ayrılık hikâyesi, sinematik kısa film."],
+projects:["Projelerim","Hesabına kaydedilen projeler.",""],
+account:["Hesabım","SESMOD hesap bilgilerin.",""]
+};
+
+window.openTool=async type=>{
+$("editor").classList.remove("hidden");
+$("toolTitle").textContent=tools[type][0];
+$("toolDescription").textContent=tools[type][1];
+$("toolMessage").textContent="";
+if(type==="projects"){
+$("toolContent").innerHTML="<p>Projeler yükleniyor...</p>";
+const {data,error}=await db.from("projects").select("id,title,project_type,created_at").order("created_at",{ascending:false});
+if(error){$("toolContent").textContent="Projeler yüklenemedi: "+error.message;return}
+$("toolContent").innerHTML=data.length?data.map(p=>`<div class="project"><b>${escapeText(p.title)}</b><br><span class="muted">${escapeText(p.project_type||"Proje")} • ${new Date(p.created_at).toLocaleDateString("tr-TR")}</span></div>`).join(""):"Henüz kayıtlı projen yok.";
+return;
+}
+if(type==="account"){
+$("toolContent").textContent=currentUser?.email||"";
+return;
+}
+$("toolContent").innerHTML=`
+<label>Proje başlığı</label>
+<input id="projectTitle" placeholder="Projenin adı">
+<label>İsteğini anlat</label>
+<textarea id="prompt" rows="5" placeholder="${tools[type][2]}"></textarea>
+<button class="primary full" onclick="saveProject('${type}')">Projeyi kaydet</button>
+<p class="muted">Gerçek yapay zekâ üretim bağlantısı bir sonraki kurulum aşamasında eklenecek.</p>`;
+};
+window.closeTool=()=>{$("editor").classList.add("hidden")};
+function escapeText(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+window.saveProject=async type=>{
+const title=$("projectTitle").value.trim();
+const prompt=$("prompt").value.trim();
+if(!title||!prompt){$("toolMessage").textContent="Proje başlığı ve açıklaması gerekli.";return}
+$("toolMessage").textContent="Kaydediliyor...";
+const {error}=await db.from("projects").insert({
+user_id:currentUser.id,
+title,
+project_type:type,
+project_data:{prompt},
+status:"draft"
 });
+$("toolMessage").textContent=error?"Kayıt hatası: "+error.message:"Projen kaydedildi!";
+};
 </script>
 </body>
 </html>
