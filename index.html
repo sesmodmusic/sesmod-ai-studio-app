@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="tr">
 <head>
@@ -41,6 +42,7 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 </style>
 </head>
 <body>
+
 <header>
 <div class="logo">SESMOD<small>AI STUDIO</small></div>
 <button class="secondary hidden" id="logout">Çıkış Yap</button>
@@ -50,15 +52,15 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 <div class="panel">
 <h2>SESMOD hesabına giriş</h2>
 <div class="tabs">
-<button class="primary" id="loginTab">Giriş Yap</button>
-<button class="secondary" id="signupTab">Hesap Oluştur</button>
+<button type="button" class="primary" id="loginTab">Giriş Yap</button>
+<button type="button" class="secondary" id="signupTab">Hesap Oluştur</button>
 </div>
 <form id="authForm">
 <label>E-posta</label>
 <input id="email" type="email" required placeholder="E-posta adresin">
 <label>Şifre</label>
 <input id="password" type="password" minlength="6" required placeholder="En az 6 karakter">
-<button class="primary full" id="submit">Giriş Yap</button>
+<button type="submit" class="primary full" id="submit">Giriş Yap</button>
 </form>
 <div id="message"></div>
 </div>
@@ -110,104 +112,208 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 </main>
 
 <script>
-const URL="https://izlwpgepxyzzzsvfcuph.supabase.co";
-const KEY="sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
-const db=window.supabase.createClient(URL,KEY);
-let mode="login",currentUser=null;
+const SUPABASE_URL="https://izlwpgepxyzzzsvfcuph.supabase.co";
+const SUPABASE_KEY="sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
+
+let db=null;
+let mode="login";
+let currentUser=null;
 
 const $=id=>document.getElementById(id);
-function msg(t){$("message").textContent=t}
-function showDashboard(user){
-currentUser=user;
-$("auth").classList.add("hidden");
-$("workspace").classList.remove("hidden");
-$("logout").classList.remove("hidden");
-$("welcomeEmail").textContent=user.email||"";
-}
-function showLogin(){
-currentUser=null;
-$("workspace").classList.add("hidden");
-$("logout").classList.add("hidden");
-$("auth").classList.remove("hidden");
-}
-$("loginTab").onclick=()=>{mode="login";$("submit").textContent="Giriş Yap";msg("")};
-$("signupTab").onclick=()=>{mode="signup";$("submit").textContent="Hesap Oluştur";msg("")};
 
-$("authForm").onsubmit=async e=>{
-e.preventDefault();
-$("submit").disabled=true;
-msg("İşlem yapılıyor...");
-try{
-const email=$("email").value.trim();
-const password=$("password").value;
-const result=mode==="signup"
-?await db.auth.signUp({email,password})
-:await db.auth.signInWithPassword({email,password});
-if(result.error)throw result.error;
-if(mode==="signup"&&!result.data.session){
-msg("Kayıt oluşturuldu. E-postanı doğrula, ardından giriş yap.");
-}else if(result.data.user){showDashboard(result.data.user)}
-}catch(err){msg(err.message)}
-finally{$("submit").disabled=false}
+function msg(t){
+  $("message").textContent=t;
+}
+
+function connectionCheck(){
+  if(!db){
+    msg("Bağlantı kurulamadı. İnternetini kontrol edip sayfayı yenile.");
+    return false;
+  }
+  return true;
+}
+
+function showDashboard(user){
+  currentUser=user;
+  $("auth").classList.add("hidden");
+  $("workspace").classList.remove("hidden");
+  $("logout").classList.remove("hidden");
+  $("welcomeEmail").textContent=user.email||"";
+}
+
+function showLogin(){
+  currentUser=null;
+  $("workspace").classList.add("hidden");
+  $("logout").classList.add("hidden");
+  $("auth").classList.remove("hidden");
+}
+
+$("loginTab").onclick=()=>{
+  mode="login";
+  $("submit").textContent="Giriş Yap";
+  msg("");
 };
 
-$("logout").onclick=async()=>{await db.auth.signOut();showLogin()};
-db.auth.getSession().then(({data})=>{
-if(data.session?.user)showDashboard(data.session.user)
-});
-db.auth.onAuthStateChange((event,session)=>{
-if(event==="SIGNED_OUT")showLogin();
-});
+$("signupTab").onclick=()=>{
+  mode="signup";
+  $("submit").textContent="Hesap Oluştur";
+  msg("");
+};
+
+$("authForm").onsubmit=async e=>{
+  e.preventDefault();
+  if(!connectionCheck())return;
+
+  $("submit").disabled=true;
+  msg("İşlem yapılıyor...");
+
+  try{
+    const email=$("email").value.trim();
+    const password=$("password").value;
+
+    const result=mode==="signup"
+      ?await db.auth.signUp({email,password})
+      :await db.auth.signInWithPassword({email,password});
+
+    if(result.error)throw result.error;
+
+    if(mode==="signup"&&!result.data.session){
+      msg("Kayıt oluşturuldu. E-postanı doğrula, ardından giriş yap.");
+    }else if(result.data.user){
+      showDashboard(result.data.user);
+    }
+  }catch(err){
+    msg(err.message||"Bir hata oluştu.");
+  }finally{
+    $("submit").disabled=false;
+  }
+};
+
+$("logout").onclick=async()=>{
+  if(!connectionCheck())return;
+  const {error}=await db.auth.signOut();
+  if(error){
+    msg(error.message);
+    return;
+  }
+  showLogin();
+};
 
 const tools={
-music:["AI Müzik","Müzik üretim fikrini ve tarzını yaz.","Örnek: Duygusal modern arabesk, erkek vokal, klarnet ve gitar."],
-lyrics:["AI Şarkı Yazarı","Yazılmasını istediğin şarkının konusunu anlat.","Örnek: Gurbet, hasret ve memleket özlemi."],
-image:["AI Görsel","Oluşturmak istediğin görseli tarif et.","Örnek: Gece yağmur altında yalnız bir insan, sinematik albüm kapağı."],
-video:["AI Video","Oluşturmak istediğin videoyu tarif et.","Örnek: Duygusal bir ayrılık hikâyesi, sinematik kısa film."],
-projects:["Projelerim","Hesabına kaydedilen projeler.",""],
-account:["Hesabım","SESMOD hesap bilgilerin.",""]
+  music:["AI Müzik","Müzik üretim fikrini ve tarzını yaz.","Örnek: Duygusal modern arabesk, erkek vokal, klarnet ve gitar."],
+  lyrics:["AI Şarkı Yazarı","Yazılmasını istediğin şarkının konusunu anlat.","Örnek: Gurbet, hasret ve memleket özlemi."],
+  image:["AI Görsel","Oluşturmak istediğin görseli tarif et.","Örnek: Gece yağmur altında yalnız bir insan, sinematik albüm kapağı."],
+  video:["AI Video","Oluşturmak istediğin videoyu tarif et.","Örnek: Duygusal bir ayrılık hikâyesi, sinematik kısa film."],
+  projects:["Projelerim","Hesabına kaydedilen projeler.",""],
+  account:["Hesabım","SESMOD hesap bilgilerin.",""]
 };
 
 window.openTool=async type=>{
-$("editor").classList.remove("hidden");
-$("toolTitle").textContent=tools[type][0];
-$("toolDescription").textContent=tools[type][1];
-$("toolMessage").textContent="";
-if(type==="projects"){
-$("toolContent").innerHTML="<p>Projeler yükleniyor...</p>";
-const {data,error}=await db.from("projects").select("id,title,project_type,created_at").order("created_at",{ascending:false});
-if(error){$("toolContent").textContent="Projeler yüklenemedi: "+error.message;return}
-$("toolContent").innerHTML=data.length?data.map(p=>`<div class="project"><b>${escapeText(p.title)}</b><br><span class="muted">${escapeText(p.project_type||"Proje")} • ${new Date(p.created_at).toLocaleDateString("tr-TR")}</span></div>`).join(""):"Henüz kayıtlı projen yok.";
-return;
-}
-if(type==="account"){
-$("toolContent").textContent=currentUser?.email||"";
-return;
-}
-$("toolContent").innerHTML=`
-<label>Proje başlığı</label>
-<input id="projectTitle" placeholder="Projenin adı">
-<label>İsteğini anlat</label>
-<textarea id="prompt" rows="5" placeholder="${tools[type][2]}"></textarea>
-<button class="primary full" onclick="saveProject('${type}')">Projeyi kaydet</button>
-<p class="muted">Gerçek yapay zekâ üretim bağlantısı bir sonraki kurulum aşamasında eklenecek.</p>`;
+  if(!currentUser||!connectionCheck())return;
+  if(!tools[type])return;
+
+  $("editor").classList.remove("hidden");
+  $("toolTitle").textContent=tools[type][0];
+  $("toolDescription").textContent=tools[type][1];
+  $("toolMessage").textContent="";
+
+  if(type==="projects"){
+    $("toolContent").textContent="Projeler yükleniyor...";
+
+    const {data,error}=await db.from("projects")
+      .select("id,title,project_type,created_at")
+      .order("created_at",{ascending:false});
+
+    if(error){
+      $("toolContent").textContent="Projeler yüklenemedi: "+error.message;
+      return;
+    }
+
+    $("toolContent").innerHTML=data.length
+      ?data.map(p=>`<div class="project"><b>${escapeText(p.title)}</b><br><span class="muted">${escapeText(p.project_type||"Proje")} • ${new Date(p.created_at).toLocaleDateString("tr-TR")}</span></div>`).join("")
+      :"Henüz kayıtlı projen yok.";
+    return;
+  }
+
+  if(type==="account"){
+    $("toolContent").textContent=currentUser.email||"";
+    return;
+  }
+
+  $("toolContent").innerHTML=`
+    <label>Proje başlığı</label>
+    <input id="projectTitle" placeholder="Projenin adı">
+    <label>İsteğini anlat</label>
+    <textarea id="prompt" rows="5" placeholder="${tools[type][2]}"></textarea>
+    <button class="primary full" onclick="saveProject('${type}')">Projeyi kaydet</button>
+    <p class="muted">Gerçek yapay zekâ üretim bağlantıları sonraki aşamada eklenecek.</p>
+  `;
 };
-window.closeTool=()=>{$("editor").classList.add("hidden")};
-function escapeText(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+window.closeTool=()=>{
+  $("editor").classList.add("hidden");
+};
+
+function escapeText(s){
+  return String(s??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
 window.saveProject=async type=>{
-const title=$("projectTitle").value.trim();
-const prompt=$("prompt").value.trim();
-if(!title||!prompt){$("toolMessage").textContent="Proje başlığı ve açıklaması gerekli.";return}
-$("toolMessage").textContent="Kaydediliyor...";
-const {error}=await db.from("projects").insert({
-user_id:currentUser.id,
-title,
-project_type:type,
-project_data:{prompt},
-status:"draft"
-});
-$("toolMessage").textContent=error?"Kayıt hatası: "+error.message:"Projen kaydedildi!";
+  if(!currentUser||!connectionCheck())return;
+
+  const title=$("projectTitle").value.trim();
+  const prompt=$("prompt").value.trim();
+
+  if(!title||!prompt){
+    $("toolMessage").textContent="Proje başlığı ve açıklaması gerekli.";
+    return;
+  }
+
+  $("toolMessage").textContent="Kaydediliyor...";
+
+  const {error}=await db.from("projects").insert({
+    user_id:currentUser.id,
+    title,
+    project_type:type,
+    project_data:{prompt},
+    status:"draft"
+  });
+
+  $("toolMessage").textContent=error
+    ?"Kayıt hatası: "+error.message
+    :"Projen kaydedildi!";
 };
+
+try{
+  if(window.supabase&&window.supabase.createClient){
+    db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    db.auth.getSession().then(({data,error})=>{
+      if(error){
+        msg(error.message);
+        return;
+      }
+      if(data.session?.user){
+        showDashboard(data.session.user);
+      }
+    }).catch(err=>msg(err.message));
+
+    db.auth.onAuthStateChange((event,session)=>{
+      if(event==="SIGNED_OUT"){
+        showLogin();
+      }else if(session?.user){
+        showDashboard(session.user);
+      }
+    });
+  }else{
+    msg("Supabase kütüphanesi yüklenemedi. Sayfayı yenile.");
+  }
+}catch(err){
+  msg("Bağlantı hatası: "+err.message);
+}
 </script>
+
 </body>
 </html>
