@@ -15,16 +15,16 @@ button{cursor:pointer}
 header{padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #302c40}
 .logo{font-size:21px;font-weight:900;letter-spacing:3px}
 .logo small{display:block;font-size:10px;color:#a78bfa;letter-spacing:4px}
-#auth{max-width:420px;margin:65px auto;padding:24px}
-#auth,#workspace{padding:20px}
+#auth{max-width:420px;margin:65px auto;padding:20px}
 .panel{background:#1b1a27;border:1px solid #373248;border-radius:17px;padding:20px}
 input,textarea,select{width:100%;padding:13px;margin:8px 0 14px;background:#101018;color:white;border:1px solid #484158;border-radius:10px}
+textarea{resize:vertical}
 button.primary{background:linear-gradient(100deg,#7655e8,#a05eea);color:white;border:0;border-radius:10px;padding:13px 18px;font-weight:700}
 button.secondary{background:#302a43;color:white;border:1px solid #554a70;border-radius:10px;padding:11px}
 .full{width:100%}
 .tabs{display:flex;gap:8px;margin:15px 0}
 .tabs button{flex:1}
-#workspace{max-width:950px;margin:auto}
+#workspace{max-width:950px;margin:auto;padding:20px}
 .welcome{padding:24px 4px}
 .welcome h1{font-size:27px;margin-bottom:5px}
 .muted{color:#aaa5bb;font-size:13px}
@@ -34,10 +34,12 @@ button.secondary{background:#302a43;color:white;border:1px solid #554a70;border-
 .tool span{color:#aaa5bb;font-size:12px}
 .symbol{font-size:25px}
 #editor{margin-top:20px}
-#message{color:#c5b5ff;font-size:13px;min-height:20px;margin:10px 0}
+#message,#toolMessage{color:#c5b5ff;font-size:13px;min-height:20px;margin:10px 0}
 .project{border-bottom:1px solid #393348;padding:12px 0;font-size:14px}
 .hidden{display:none!important}
 footer{text-align:center;color:#777185;font-size:11px;padding:25px}
+.result{background:#101018;border:1px solid #484158;border-radius:10px;padding:14px;margin-top:15px}
+.result h3{margin-top:0}
 @media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -77,7 +79,7 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 <div class="grid">
 <button class="tool" onclick="openTool('music')">
 <div class="symbol">🎵</div><b>AI Müzik</b>
-<span>Şarkı ve müzik üretimi</span>
+<span>Şarkı ve müzik üretim hazırlığı</span>
 </button>
 <button class="tool" onclick="openTool('lyrics')">
 <div class="symbol">✍️</div><b>AI Şarkı Yazarı</b>
@@ -85,11 +87,11 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 </button>
 <button class="tool" onclick="openTool('image')">
 <div class="symbol">🎨</div><b>AI Görsel</b>
-<span>Kapak ve afiş üretimi</span>
+<span>Kapak ve afiş fikirleri</span>
 </button>
 <button class="tool" onclick="openTool('video')">
 <div class="symbol">🎬</div><b>AI Video</b>
-<span>Klip ve kısa film üretimi</span>
+<span>Klip ve kısa film fikirleri</span>
 </button>
 <button class="tool" onclick="openTool('projects')">
 <div class="symbol">📁</div><b>Projelerim</b>
@@ -118,6 +120,7 @@ const SUPABASE_KEY="sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
 let db=null;
 let mode="login";
 let currentUser=null;
+let lastMusicPrompt="";
 
 const $=id=>document.getElementById(id);
 
@@ -200,12 +203,12 @@ $("logout").onclick=async()=>{
 };
 
 const tools={
-  music:["AI Müzik","Müzik üretim fikrini ve tarzını yaz.","Örnek: Duygusal modern arabesk, erkek vokal, klarnet ve gitar."],
-  lyrics:["AI Şarkı Yazarı","Yazılmasını istediğin şarkının konusunu anlat.","Örnek: Gurbet, hasret ve memleket özlemi."],
-  image:["AI Görsel","Oluşturmak istediğin görseli tarif et.","Örnek: Gece yağmur altında yalnız bir insan, sinematik albüm kapağı."],
-  video:["AI Video","Oluşturmak istediğin videoyu tarif et.","Örnek: Duygusal bir ayrılık hikâyesi, sinematik kısa film."],
-  projects:["Projelerim","Hesabına kaydedilen projeler.",""],
-  account:["Hesabım","SESMOD hesap bilgilerin.",""]
+  music:["AI Müzik","Şarkını oluşturmak için bilgileri doldur."],
+  lyrics:["AI Şarkı Yazarı","Şarkı yazım projenin konusunu anlat."],
+  image:["AI Görsel","Oluşturmak istediğin görseli tarif et."],
+  video:["AI Video","Oluşturmak istediğin videoyu tarif et."],
+  projects:["Projelerim","Hesabına kaydedilen projeler."],
+  account:["Hesabım","SESMOD hesap bilgilerin."]
 };
 
 window.openTool=async type=>{
@@ -240,14 +243,149 @@ window.openTool=async type=>{
     return;
   }
 
+  if(type==="music"){
+    $("toolContent").innerHTML=`
+      <label>Şarkı adı</label>
+      <input id="projectTitle" placeholder="Örn: Gurbet Yarası">
+
+      <label>Şarkı sözleri</label>
+      <textarea id="lyrics" rows="7" placeholder="Şarkı sözlerini buraya yaz..."></textarea>
+
+      <label>Müzik tarzı</label>
+      <select id="genre">
+        <option>Modern Arabesk</option>
+        <option>Geleneksel Türkü</option>
+        <option>Anadolu Rock</option>
+        <option>Psikedelik Anadolu Rock</option>
+        <option>Arabesk Rock</option>
+        <option>Türkçe Pop</option>
+      </select>
+
+      <label>Vokal</label>
+      <select id="vocal">
+        <option>Erkek vokal</option>
+        <option>Kadın vokal</option>
+        <option>Erkek ve kadın düet</option>
+        <option>Enstrümantal</option>
+      </select>
+
+      <label>Enstrümanlar</label>
+      <input id="instruments" placeholder="Bağlama, klarnet, gitar...">
+
+      <label>Duygu ve atmosfer</label>
+      <input id="mood" placeholder="Hüzünlü, etkileyici, gurbet...">
+
+      <label>Tempo</label>
+      <select id="tempo">
+        <option>Yavaş</option>
+        <option>Orta</option>
+        <option>Hareketli</option>
+      </select>
+
+      <button class="primary full" onclick="buildMusicPrompt()">Müzik promptunu oluştur</button>
+      <div id="musicResult"></div>
+    `;
+    return;
+  }
+
   $("toolContent").innerHTML=`
     <label>Proje başlığı</label>
     <input id="projectTitle" placeholder="Projenin adı">
     <label>İsteğini anlat</label>
-    <textarea id="prompt" rows="5" placeholder="${tools[type][2]}"></textarea>
+    <textarea id="prompt" rows="5" placeholder="İsteğini buraya yaz..."></textarea>
     <button class="primary full" onclick="saveProject('${type}')">Projeyi kaydet</button>
-    <p class="muted">Gerçek yapay zekâ üretim bağlantıları sonraki aşamada eklenecek.</p>
   `;
+};
+
+window.buildMusicPrompt=()=>{
+  const title=$("projectTitle").value.trim();
+  const lyrics=$("lyrics").value.trim();
+  const genre=$("genre").value;
+  const vocal=$("vocal").value;
+  const instruments=$("instruments").value.trim()||"Genre-appropriate traditional and modern instruments";
+  const mood=$("mood").value.trim()||"Emotional and memorable";
+  const tempo=$("tempo").value;
+
+  if(!title){
+    $("toolMessage").textContent="Önce şarkı adını yaz.";
+    return;
+  }
+
+  const prompt=[
+    "Create an original Turkish song.",
+    "Genre: "+genre+".",
+    "Vocal: "+vocal+".",
+    "Instruments: "+instruments+".",
+    "Mood: "+mood+".",
+    "Tempo: "+tempo+".",
+    "Use an expressive and memorable melody.",
+    "Start with vocals quickly; avoid a long instrumental intro.",
+    "Use clear Turkish pronunciation and professional studio production.",
+    "Do not imitate any existing artist or copyrighted song."
+  ].join(" ");
+
+  lastMusicPrompt=prompt;
+
+  $("musicResult").innerHTML=`
+    <div class="result">
+      <h3>Hazır müzik promptun</h3>
+      <textarea id="generatedPrompt" rows="8" readonly></textarea>
+      <h3>Şarkı sözlerin</h3>
+      <textarea id="generatedLyrics" rows="7" readonly></textarea>
+      <button class="secondary full" onclick="copyMusicPrompt()">Promptu kopyala</button>
+      <button class="primary full" style="margin-top:10px" onclick="saveMusicProject()">Projeyi kaydet</button>
+      <p class="muted">Bu metni müzik üretim aracındaki açıklama alanına, sözleri ise şarkı sözleri alanına ekleyebilirsin.</p>
+    </div>
+  `;
+
+  $("generatedPrompt").value=prompt;
+  $("generatedLyrics").value=lyrics;
+  $("toolMessage").textContent="Müzik promptun hazır.";
+};
+
+window.copyMusicPrompt=async()=>{
+  const text=$("generatedPrompt")?.value||lastMusicPrompt;
+  if(!text)return;
+  try{
+    await navigator.clipboard.writeText(text);
+    $("toolMessage").textContent="Prompt kopyalandı.";
+  }catch(err){
+    $("toolMessage").textContent="Kopyalama desteklenmedi. Metni seçip kopyalayabilirsin.";
+  }
+};
+
+window.saveMusicProject=async()=>{
+  if(!currentUser||!connectionCheck())return;
+
+  const title=$("projectTitle").value.trim();
+  const lyrics=$("lyrics").value.trim();
+  const genre=$("genre").value;
+  const vocal=$("vocal").value;
+  const instruments=$("instruments").value.trim();
+  const mood=$("mood").value.trim();
+  const tempo=$("tempo").value;
+
+  if(!title||!lastMusicPrompt){
+    $("toolMessage").textContent="Önce şarkı adını yazıp promptu oluştur.";
+    return;
+  }
+
+  $("toolMessage").textContent="Proje kaydediliyor...";
+
+  const {error}=await db.from("projects").insert({
+    user_id:currentUser.id,
+    title,
+    project_type:"music",
+    project_data:{
+      prompt:lastMusicPrompt,
+      lyrics,genre,vocal,instruments,mood,tempo
+    },
+    status:"draft"
+  });
+
+  $("toolMessage").textContent=error
+    ?"Kayıt hatası: "+error.message
+    :"Müzik projen kaydedildi!";
 };
 
 window.closeTool=()=>{
