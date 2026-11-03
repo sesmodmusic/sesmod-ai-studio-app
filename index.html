@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101018">
+<title>SESMOD AI STUDIO</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#29233d 0,#101018 55%);color:#f7f5ff;font-family:system-ui,sans-serif;display:grid;place-items:center;padding:22px}
+.wrap{width:100%;max-width:420px}
+.brand{text-align:center;margin-bottom:26px}
+.mark{width:58px;height:58px;margin:0 auto 12px;border:1px solid #8c72ff;border-radius:18px;display:grid;place-items:center;color:#c7baff;font-size:25px;font-weight:800}
+.brand h1{font-size:25px;letter-spacing:3px;margin:0}
+.brand p{color:#aaa5bb;margin:7px 0 0;font-size:13px;letter-spacing:2px}
+.panel{background:#191923;border:1px solid #343142;border-radius:22px;padding:25px}
+.tabs{display:flex;background:#101018;border-radius:12px;padding:4px;margin-bottom:22px}
+.tabs button{flex:1;border:0;background:transparent;color:#aaa5bb;padding:11px;border-radius:9px}
+.tabs button.active{background:#7658e8;color:white;font-weight:700}
+label{display:block;font-size:13px;color:#c9c5d6;margin:15px 0 7px}
+input{width:100%;padding:14px;border:1px solid #3c394b;border-radius:11px;background:#101018;color:white;font-size:16px}
+.primary{width:100%;border:0;border-radius:11px;padding:15px;margin-top:22px;background:linear-gradient(100deg,#7555e8,#a05eea);color:white;font-size:15px;font-weight:750}
+.primary:disabled{opacity:.6}
+.hint{font-size:12px;color:#aaa5bb;text-align:center;line-height:1.6;margin-top:17px}
+.message{font-size:13px;line-height:1.5;margin-top:14px;color:#c9baff;min-height:18px}
+.hidden{display:none!important}
+.dashboard{text-align:center}
+.logout{margin-top:18px;padding:11px 20px;border:1px solid #51496c;border-radius:10px;background:transparent;color:white}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="brand">
+<div class="mark">S</div>
+<h1>SESMOD</h1>
+<p>AI STUDIO</p>
+</header>
+
+<section class="panel" id="authPanel">
+<div class="tabs">
+<button id="loginTab" class="active" type="button">Giriş Yap</button>
+<button id="signupTab" type="button">Hesap Oluştur</button>
+</div>
+
+<form id="authForm">
+<label for="email">E-posta</label>
+<input id="email" type="email" autocomplete="email" placeholder="ornek@mail.com" required>
+<label for="password">Şifre</label>
+<input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="En az 6 karakter" required>
+<button class="primary" id="submitBtn" type="submit">Giriş Yap</button>
+</form>
+
+<div class="message" id="message" role="status"></div>
+<p class="hint">Tek SESMOD hesabı ile MUSIC ve AI STUDIO uygulamalarına erişim.</p>
+</section>
+
+<section class="panel dashboard hidden" id="appPanel">
+<h2>Hoş geldin!</h2>
+<p id="userEmail"></p>
+<p>SESMOD AI STUDIO hesabınla giriş yaptın.</p>
+<button class="logout" id="logoutBtn" type="button">Çıkış Yap</button>
+</section>
+</main>
+
+<script>
+const SUPABASE_URL="https://izlwpgepxyzzzsvfcuph.supabase.co";
+const SUPABASE_KEY="sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const form=document.getElementById("authForm");
+const message=document.getElementById("message");
+const loginTab=document.getElementById("loginTab");
+const signupTab=document.getElementById("signupTab");
+const submitBtn=document.getElementById("submitBtn");
+let mode="login";
+
+function setMode(next){
+mode=next;
+loginTab.classList.toggle("active",mode==="login");
+signupTab.classList.toggle("active",mode==="signup");
+submitBtn.textContent=mode==="login"?"Giriş Yap":"Hesap Oluştur";
+message.textContent="";
+}
+
+loginTab.onclick=()=>setMode("login");
+signupTab.onclick=()=>setMode("signup");
+
+function showApp(user){
+document.getElementById("authPanel").classList.add("hidden");
+document.getElementById("appPanel").classList.remove("hidden");
+document.getElementById("userEmail").textContent=user.email||"";
+}
+
+function showAuth(){
+document.getElementById("appPanel").classList.add("hidden");
+document.getElementById("authPanel").classList.remove("hidden");
+}
+
+form.addEventListener("submit",async e=>{
+e.preventDefault();
+submitBtn.disabled=true;
+message.textContent="İşleniyor…";
+const email=document.getElementById("email").value.trim();
+const password=document.getElementById("password").value;
+
+try{
+let result;
+if(mode==="signup"){
+result=await db.auth.signUp({email,password});
+}else{
+result=await db.auth.signInWithPassword({email,password});
+}
+if(result.error)throw result.error;
+
+if(mode==="signup"&&!result.data.session){
+message.textContent="Kayıt oluşturuldu. E-postana gelen doğrulama bağlantısına tıkla, sonra giriş yap.";
+}else if(result.data.user){
+showApp(result.data.user);
+message.textContent="";
+}
+}catch(err){
+message.textContent=err.message||"Bir hata oluştu.";
+}finally{
+submitBtn.disabled=false;
+}
+});
+
+document.getElementById("logoutBtn").onclick=async()=>{
+await db.auth.signOut();
+showAuth();
+};
+
+db.auth.getSession().then(({data})=>{
+if(data.session?.user)showApp(data.session.user);
+});
+
+db.auth.onAuthStateChange((event,session)=>{
+if(event==="SIGNED_OUT"||!session)showAuth();
+});
+</script>
+</body>
+</html>
