@@ -168,8 +168,7 @@ async function showDashboard(user){
     balance=document.createElement("div");
     balance.id="creditBalance";
     balance.className="result";
-    $("welcome").appendChild(balance);
-  }
+    $("workspace").querySelector(".welcome").appendChild(balance);
 
   balance.innerHTML="🎁 Kalan deneme kredin: <b>"+data.credits+"</b>";
 }
