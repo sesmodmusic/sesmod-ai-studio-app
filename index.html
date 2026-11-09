@@ -362,7 +362,8 @@ function escapeAttribute(value) {
 return String(value)
 .replace(/&/g,"&amp;").replace(/"/g,"&quot;")
 .replace(/</g,"&lt;").replace(/>/g,"&gt;");
-} function renderVideo() {
+} 
+function renderVideo() {
 $("toolContent").innerHTML=`
 <label>Video adı</label>
 <input id="videoTitle" placeholder="Video başlığı">
