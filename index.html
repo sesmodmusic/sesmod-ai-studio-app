@@ -158,6 +158,8 @@ async function loadCredits(){
     .select("credits")
     .eq("user_id",currentUser.id)
     .single();
+  console.log("KREDİ VERİSİ:",data);
+console.log("KREDİ HATASI:",error);
 
   let balance=document.getElementById("creditBalance");
 
