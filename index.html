@@ -78,7 +78,7 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 </section>
 
 <main id="workspace" class="hidden">
-<div class="welcome">
+<div class="welcome" id="welcome">
 <p class="muted">YARATICI ÜRETİM MERKEZİ</p>
 <h1>Üretmeye başla.</h1>
 <p class="muted" id="welcomeEmail"></p>
@@ -142,12 +142,36 @@ function connectionCheck(){
   return true;
 }
 
-function showDashboard(user){
+async function showDashboard(user){
   currentUser=user;
   $("auth").classList.add("hidden");
   $("workspace").classList.remove("hidden");
   $("logout").classList.remove("hidden");
   $("welcomeEmail").textContent=user.email||"";
+
+  await loadCredits();
+}async function loadCredits(){
+  const {data,error}=await db
+    .from("user_credits")
+    .select("credits")
+    .eq("user_id",currentUser.id)
+    .single();
+
+  if(error){
+    console.error("Kredi yüklenemedi:",error.message);
+    return;
+  }
+
+  let balance=document.getElementById("creditBalance");
+
+  if(!balance){
+    balance=document.createElement("div");
+    balance.id="creditBalance";
+    balance.className="result";
+    $("welcome").appendChild(balance);
+  }
+
+  balance.innerHTML="🎁 Kalan deneme kredin: <b>"+data.credits+"</b>";
 }
 
 function showLogin(){
