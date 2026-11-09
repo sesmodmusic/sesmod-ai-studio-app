@@ -142,15 +142,40 @@ function connectionCheck(){
   return true;
 }
 
+
 async function showDashboard(user){
   currentUser=user;
   $("auth").classList.add("hidden");
   $("workspace").classList.remove("hidden");
   $("logout").classList.remove("hidden");
   $("welcomeEmail").textContent=user.email||"";
-
   await loadCredits();
-}async function loadCredits(){
+}
+
+async function loadCredits(){
+  const {data,error}=await db
+    .from("user_credits")
+    .select("credits")
+    .eq("user_id",currentUser.id)
+    .single();
+
+  let balance=document.getElementById("creditBalance");
+
+  if(!balance){
+    balance=document.createElement("div");
+    balance.id="creditBalance";
+    balance.className="result";
+    $("welcome").appendChild(balance);
+  }
+
+  if(error){
+    balance.textContent="Kredi bilgisi yüklenemedi: "+error.message;
+    return;
+  }
+
+  balance.innerHTML="🎁 Kalan deneme kredin: <b>"+data.credits+"</b>";
+}
+  
   const {data,error}=await db
     .from("user_credits")
     .select("credits")
