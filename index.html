@@ -15,14 +15,14 @@ button{cursor:pointer}
 header{padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #302c40}
 .logo{font-size:21px;font-weight:900;letter-spacing:3px}
 .logo small{display:block;font-size:10px;color:#a78bfa;letter-spacing:4px}
-#auth{max-width:440px;margin:45px auto;padding:20px}
+#auth{max-width:440px;margin:40px auto;padding:20px}
 .panel{background:#1b1a27;border:1px solid #373248;border-radius:17px;padding:20px}
 input,textarea,select{width:100%;padding:13px;margin:8px 0 14px;background:#101018;color:white;border:1px solid #484158;border-radius:10px}
 textarea{resize:vertical}
 button.primary{background:linear-gradient(100deg,#7655e8,#a05eea);color:white;border:0;border-radius:10px;padding:13px 18px;font-weight:700}
 button.secondary{background:#302a43;color:white;border:1px solid #554a70;border-radius:10px;padding:11px}
-button.danger{background:#612d3b;color:white;border:1px solid #9b435b;border-radius:10px;padding:11px}
-.full{width:100%}
+button.danger{background:#512b39;color:#fff;border:1px solid #8c4058;border-radius:10px;padding:11px}
+.full{width:100%;margin-top:8px}
 .tabs{display:flex;gap:8px;margin:15px 0}
 .tabs button{flex:1}
 #workspace{max-width:950px;margin:auto;padding:20px}
@@ -36,16 +36,15 @@ button.danger{background:#612d3b;color:white;border:1px solid #9b435b;border-rad
 .symbol{font-size:25px}
 #editor{margin-top:20px}
 #message,#toolMessage{color:#c5b5ff;font-size:13px;min-height:20px;margin:10px 0}
-.project{background:#242133;border:1px solid #403851;border-radius:12px;padding:15px;margin:10px 0}
-.project button{margin-top:10px}
+.project{background:#242132;border:1px solid #393348;border-radius:12px;padding:14px;margin:10px 0}
+.project button{margin-top:8px}
 .hidden{display:none!important}
 footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 .result{background:#101018;border:1px solid #484158;border-radius:10px;padding:14px;margin-top:15px}
 .result h3{margin-top:0}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.actions button{flex:1;min-width:110px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{flex:1}
 @media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:420px){#workspace{padding:12px}.panel{padding:15px}.welcome h1{font-size:24px}}
 </style>
 </head>
 <body>
@@ -58,10 +57,15 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 <section id="auth">
 <div class="panel">
 <h2>SESMOD hesabına giriş</h2>
+<p class="muted">Yaratıcılığını SESMOD ile keşfet.</p>
+
+<button type="button" class="secondary full" id="googleLogin">Google ile giriş yap</button>
+
 <div class="tabs">
 <button type="button" class="primary" id="loginTab">Giriş Yap</button>
 <button type="button" class="secondary" id="signupTab">Hesap Oluştur</button>
 </div>
+
 <form id="authForm">
 <label>E-posta</label>
 <input id="email" type="email" required placeholder="E-posta adresin">
@@ -69,8 +73,6 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 <input id="password" type="password" minlength="6" required placeholder="En az 6 karakter">
 <button type="submit" class="primary full" id="submit">Giriş Yap</button>
 </form>
-<div style="text-align:center;margin:15px 0">veya</div>
-<button type="button" class="secondary full" id="googleLogin">Google ile giriş yap</button>
 <div id="message"></div>
 </div>
 </section>
@@ -115,7 +117,7 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 <p class="muted" id="toolDescription"></p>
 <div id="toolContent"></div>
 <div id="toolMessage"></div>
-<button class="secondary" onclick="closeTool()">← Ana panele dön</button>
+<button class="secondary full" onclick="closeTool()">← Ana panele dön</button>
 </section>
 <footer>SESMOD AI STUDIO © 2026</footer>
 </main>
@@ -128,6 +130,7 @@ let db=null;
 let mode="login";
 let currentUser=null;
 let lastMusicPrompt="";
+let editingProjectId=null;
 
 const $=id=>document.getElementById(id);
 
@@ -166,21 +169,28 @@ $("signupTab").onclick=()=>{
   msg("");
 };
 
+$("googleLogin").onclick=async()=>{
+  if(!connectionCheck())return;
+  msg("Google giriş sayfası açılıyor...");
+  const {error}=await db.auth.signInWithOAuth({
+    provider:"google",
+    options:{redirectTo:window.location.origin}
+  });
+  if(error)msg(error.message);
+};
+
 $("authForm").onsubmit=async e=>{
   e.preventDefault();
   if(!connectionCheck())return;
   $("submit").disabled=true;
   msg("İşlem yapılıyor...");
-
   try{
     const email=$("email").value.trim();
     const password=$("password").value;
     const result=mode==="signup"
       ?await db.auth.signUp({email,password})
       :await db.auth.signInWithPassword({email,password});
-
     if(result.error)throw result.error;
-
     if(mode==="signup"&&!result.data.session){
       msg("Kayıt oluşturuldu. E-postanı doğrula, ardından giriş yap.");
     }else if(result.data.user){
@@ -193,20 +203,10 @@ $("authForm").onsubmit=async e=>{
   }
 };
 
-$("googleLogin").onclick=async()=>{
-  if(!connectionCheck())return;
-  msg("Google giriş sayfası açılıyor...");
-  const {error}=await db.auth.signInWithOAuth({
-    provider:"google",
-    options:{redirectTo:window.location.origin}
-  });
-  if(error)msg(error.message);
-};
-
 $("logout").onclick=async()=>{
   if(!connectionCheck())return;
   const {error}=await db.auth.signOut();
-  if(error){toolMsg(error.message);return}
+  if(error){msg(error.message);return}
   showLogin();
 };
 
@@ -221,28 +221,26 @@ const tools={
 
 window.openTool=async type=>{
   if(!currentUser||!connectionCheck()||!tools[type])return;
-
+  editingProjectId=null;
   $("editor").classList.remove("hidden");
   $("toolTitle").textContent=tools[type][0];
   $("toolDescription").textContent=tools[type][1];
-  $("toolMessage").textContent="";
   $("toolContent").innerHTML="";
+  toolMsg("");
 
-  if(type==="projects"){
-    await loadProjects();
-    return;
-  }
+  if(type==="projects"){await loadProjects();return}
 
   if(type==="account"){
     $("toolContent").innerHTML=`
-      <h3>Hesap bilgileri</h3>
-      <p>E-posta: ${escapeText(currentUser.email||"")}</p>
-      <p class="muted">SESMOD hesabınla giriş yaptın.</p>`;
+      <div class="result">
+        <h3>Hesap bilgileri</h3>
+        <p>E-posta: ${escapeText(currentUser.email||"")}</p>
+        <p class="muted">SESMOD AI STUDIO hesabın.</p>
+      </div>`;
     return;
   }
 
   if(type==="music"){
-    lastMusicPrompt="";
     $("toolContent").innerHTML=`
       <label>Şarkı adı</label>
       <input id="projectTitle" placeholder="Örn: Gurbet Yarası">
@@ -270,9 +268,7 @@ window.openTool=async type=>{
       <input id="mood" placeholder="Hüzünlü, etkileyici, gurbet...">
       <label>Tempo</label>
       <select id="tempo">
-        <option>Yavaş</option>
-        <option>Orta</option>
-        <option>Hareketli</option>
+        <option>Yavaş</option><option>Orta</option><option>Hareketli</option>
       </select>
       <button class="primary full" onclick="buildMusicPrompt()">Müzik promptunu oluştur</button>
       <div id="musicResult"></div>`;
@@ -289,9 +285,8 @@ window.openTool=async type=>{
 
 async function loadProjects(){
   $("toolContent").textContent="Projeler yükleniyor...";
-
   const {data,error}=await db.from("projects")
-    .select("id,title,project_type,created_at,project_data")
+    .select("id,title,project_type,project_data,created_at")
     .eq("user_id",currentUser.id)
     .order("created_at",{ascending:false});
 
@@ -299,7 +294,6 @@ async function loadProjects(){
     $("toolContent").textContent="Projeler yüklenemedi: "+error.message;
     return;
   }
-
   if(!data||data.length===0){
     $("toolContent").textContent="Henüz kayıtlı projen yok.";
     return;
@@ -309,102 +303,70 @@ async function loadProjects(){
     <div class="project">
       <b>${escapeText(p.title)}</b>
       <p class="muted">${escapeText(p.project_type||"Proje")} • ${new Date(p.created_at).toLocaleDateString("tr-TR")}</p>
-      <button class="primary full" onclick="openSavedProject('${p.id}')">Projeyi aç →</button>
-    </div>
-  `).join("");
+      <button class="primary" onclick="openSavedProject('${p.id}')">Projeyi aç</button>
+    </div>`).join("");
 }
 
-window.openSavedProject=async projectId=>{
-  toolMsg("Proje açılıyor...");
-
+window.openSavedProject=async id=>{
   const {data,error}=await db.from("projects")
-    .select("*")
-    .eq("id",projectId)
+    .select("id,title,project_type,project_data")
+    .eq("id",id)
     .eq("user_id",currentUser.id)
     .single();
 
-  if(error){
-    toolMsg("Proje açılamadı: "+error.message);
-    return;
-  }
+  if(error){toolMsg("Proje açılamadı: "+error.message);return}
+  if(!data)return;
 
-  const p=data.project_data||{};
-  const isMusic=data.project_type==="music";
-
+  editingProjectId=data.id;
+  const projectData=data.project_data||{};
   $("toolTitle").textContent=data.title;
-  $("toolDescription").textContent="Kayıtlı proje ayrıntıları";
-
+  $("toolDescription").textContent="Kayıtlı proje bilgileri.";
   $("toolContent").innerHTML=`
-    <label>Proje adı</label>
-    <input id="detailTitle" value="${escapeAttr(data.title)}">
-
-    ${isMusic?`
-      <label>Müzik promptu</label>
-      <textarea id="detailPrompt" rows="7">${escapeText(p.prompt||"")}</textarea>
-      <label>Şarkı sözleri</label>
-      <textarea id="detailLyrics" rows="9">${escapeText(p.lyrics||"")}</textarea>
-      <label>Müzik tarzı</label>
-      <input id="detailGenre" value="${escapeAttr(p.genre||"")}">
-      <label>Vokal</label>
-      <input id="detailVocal" value="${escapeAttr(p.vocal||"")}">
-      <label>Enstrümanlar</label>
-      <input id="detailInstruments" value="${escapeAttr(p.instruments||"")}">
-      <label>Duygu</label>
-      <input id="detailMood" value="${escapeAttr(p.mood||"")}">
-      <label>Tempo</label>
-      <input id="detailTempo" value="${escapeAttr(p.tempo||"")}">
-    `:`
-      <label>Proje açıklaması</label>
-      <textarea id="detailPrompt" rows="8">${escapeText(p.prompt||"")}</textarea>
-    `}
-
+    <label>Proje başlığı</label>
+    <input id="editTitle" value="${escapeAttr(data.title)}">
+    <label>Proje açıklaması / prompt</label>
+    <textarea id="editPrompt" rows="7">${escapeText(projectData.prompt||projectData.lyrics||"")}</textarea>
     <div class="actions">
-      <button class="primary" onclick="updateSavedProject('${data.id}','${data.project_type}')">Değişiklikleri kaydet</button>
-      <button class="danger" onclick="deleteSavedProject('${data.id}')">Projeyi sil</button>
+      <button class="primary" onclick="updateProject()">Değişiklikleri kaydet</button>
+      <button class="danger" onclick="deleteProject()">Projeyi sil</button>
     </div>
-    <button class="secondary full" onclick="openTool('projects')">← Projelerime dön</button>
-  `;
-  toolMsg("");
+    <button class="secondary full" onclick="openTool('projects')">← Projelerime dön</button>`;
 };
 
-window.updateSavedProject=async(id,type)=>{
-  const title=$("detailTitle").value.trim();
-  if(!title){toolMsg("Proje adı boş olamaz.");return}
+window.updateProject=async()=>{
+  if(!editingProjectId)return;
+  const title=$("editTitle").value.trim();
+  const prompt=$("editPrompt").value.trim();
+  if(!title){toolMsg("Proje başlığı boş olamaz.");return}
 
-  let projectData={prompt:$("detailPrompt").value};
+  const {data:old,error:readError}=await db.from("projects")
+    .select("project_data")
+    .eq("id",editingProjectId)
+    .eq("user_id",currentUser.id)
+    .single();
 
-  if(type==="music"){
-    projectData={
-      prompt:$("detailPrompt").value,
-      lyrics:$("detailLyrics").value,
-      genre:$("detailGenre").value,
-      vocal:$("detailVocal").value,
-      instruments:$("detailInstruments").value,
-      mood:$("detailMood").value,
-      tempo:$("detailTempo").value
-    };
-  }
+  if(readError){toolMsg("Proje okunamadı: "+readError.message);return}
 
-  toolMsg("Değişiklikler kaydediliyor...");
+  const updatedData={...(old.project_data||{}),prompt};
+  const {error}=await db.from("projects")
+    .update({title,project_data:updatedData})
+    .eq("id",editingProjectId)
+    .eq("user_id",currentUser.id);
 
-  const {error}=await db.from("projects").update({
-    title,
-    project_data:projectData
-  }).eq("id",id).eq("user_id",currentUser.id);
-
-  if(error){toolMsg("Kayıt hatası: "+error.message);return}
-  toolMsg("Proje güncellendi.");
-  $("toolTitle").textContent=title;
+  toolMsg(error?"Güncelleme hatası: "+error.message:"Projen güncellendi!");
 };
 
-window.deleteSavedProject=async id=>{
+window.deleteProject=async()=>{
+  if(!editingProjectId)return;
   if(!confirm("Bu projeyi silmek istediğine emin misin?"))return;
 
-  toolMsg("Proje siliniyor...");
-  const {error}=await db.from("projects").delete()
-    .eq("id",id).eq("user_id",currentUser.id);
+  const {error}=await db.from("projects")
+    .delete()
+    .eq("id",editingProjectId)
+    .eq("user_id",currentUser.id);
 
   if(error){toolMsg("Silme hatası: "+error.message);return}
+  editingProjectId=null;
   toolMsg("Proje silindi.");
   await loadProjects();
 };
@@ -414,7 +376,7 @@ window.buildMusicPrompt=()=>{
   const lyrics=$("lyrics").value.trim();
   const genre=$("genre").value;
   const vocal=$("vocal").value;
-  const instruments=$("instruments").value.trim()||"Genre-appropriate traditional and modern instruments";
+  const instruments=$("instruments").value.trim()||"Genre-appropriate instruments";
   const mood=$("mood").value.trim()||"Emotional and memorable";
   const tempo=$("tempo").value;
 
@@ -440,10 +402,9 @@ window.buildMusicPrompt=()=>{
       <h3>Şarkı sözlerin</h3>
       <textarea id="generatedLyrics" rows="7" readonly></textarea>
       <button class="secondary full" onclick="copyMusicPrompt()">Promptu kopyala</button>
-      <button class="primary full" style="margin-top:10px" onclick="saveMusicProject()">Projeyi kaydet</button>
-      <p class="muted">Bu metni müzik üretim aracındaki açıklama alanına ekleyebilirsin.</p>
+      <button class="primary full" onclick="saveMusicProject()">Projeyi kaydet</button>
+      <p class="muted">Bu metni müzik üretim aracında kullanabilirsin.</p>
     </div>`;
-
   $("generatedPrompt").value=lastMusicPrompt;
   $("generatedLyrics").value=lyrics;
   toolMsg("Müzik promptun hazır.");
@@ -462,16 +423,13 @@ window.copyMusicPrompt=async()=>{
 
 window.saveMusicProject=async()=>{
   if(!currentUser||!connectionCheck())return;
-
   const title=$("projectTitle").value.trim();
   const lyrics=$("lyrics").value.trim();
   if(!title||!lastMusicPrompt){
     toolMsg("Önce şarkı adını yazıp promptu oluştur.");
     return;
   }
-
   toolMsg("Proje kaydediliyor...");
-
   const {error}=await db.from("projects").insert({
     user_id:currentUser.id,
     title,
@@ -481,29 +439,24 @@ window.saveMusicProject=async()=>{
       lyrics,
       genre:$("genre").value,
       vocal:$("vocal").value,
-      instruments:$("instruments").value,
-      mood:$("mood").value,
+      instruments:$("instruments").value.trim(),
+      mood:$("mood").value.trim(),
       tempo:$("tempo").value
     },
     status:"draft"
   });
-
   toolMsg(error?"Kayıt hatası: "+error.message:"Müzik projen kaydedildi!");
 };
 
 window.saveProject=async type=>{
   if(!currentUser||!connectionCheck())return;
-
   const title=$("projectTitle").value.trim();
   const prompt=$("prompt").value.trim();
-
   if(!title||!prompt){
     toolMsg("Proje başlığı ve açıklaması gerekli.");
     return;
   }
-
   toolMsg("Kaydediliyor...");
-
   const {error}=await db.from("projects").insert({
     user_id:currentUser.id,
     title,
@@ -511,12 +464,12 @@ window.saveProject=async type=>{
     project_data:{prompt},
     status:"draft"
   });
-
   toolMsg(error?"Kayıt hatası: "+error.message:"Projen kaydedildi!");
 };
 
 window.closeTool=()=>{
   $("editor").classList.add("hidden");
+  editingProjectId=null;
 };
 
 function escapeText(s){
@@ -524,13 +477,11 @@ function escapeText(s){
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[c]));
 }
-
 function escapeAttr(s){return escapeText(s)}
 
 try{
   if(window.supabase&&window.supabase.createClient){
     db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
     db.auth.getSession().then(({data,error})=>{
       if(error){msg(error.message);return}
       if(data.session?.user)showDashboard(data.session.user);
