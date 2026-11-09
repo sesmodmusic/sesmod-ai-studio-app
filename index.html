@@ -12,6 +12,7 @@
 body{margin:0;background:#101018;color:#f7f5ff;font-family:system-ui,sans-serif}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
 header{padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #302c40}
 .logo{font-size:21px;font-weight:900;letter-spacing:3px}
 .logo small{display:block;font-size:10px;color:#a78bfa;letter-spacing:4px}
@@ -40,10 +41,11 @@ button.danger{background:#512b39;color:#fff;border:1px solid #8c4058;border-radi
 .project button{margin-top:8px}
 .hidden{display:none!important}
 footer{text-align:center;color:#777185;font-size:11px;padding:25px}
-.result{background:#101018;border:1px solid #484158;border-radius:10px;padding:14px;margin-top:15px}
+.result{background:#101018;border:1px solid #484158;border-radius:10px;padding:14px;margin-top:15px;overflow-wrap:anywhere}
 .result h3{margin-top:0}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .actions button{flex:1}
+a{color:#c5b5ff}
 @media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -81,11 +83,9 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 <div class="welcome" id="welcome">
 <p class="muted">YARATICI ÜRETİM MERKEZİ</p>
 <h1>Üretmeye başla.</h1>
-  <p style="color:#00ff88;font-size:18px">TEST - SESMOD KREDİ ALANI</p>
 <p class="muted" id="welcomeEmail"></p>
-
 <div id="creditBalance" class="result">
-  🎁 Deneme kredilerin yükleniyor...
+🎁 Deneme kredilerin yükleniyor...
 </div>
 </div>
 
@@ -101,7 +101,7 @@ footer{text-align:center;color:#777185;font-size:11px;padding:25px}
 </button>
 <button class="tool" onclick="openTool('image')">
 <div class="symbol">🎨</div><b>AI Görsel</b>
-<span>Kapak ve afiş fikirleri</span>
+<span>Gerçek yapay zekâ görsel üretimi</span>
 </button>
 <button class="tool" onclick="openTool('video')">
 <div class="symbol">🎬</div><b>AI Video</b>
@@ -143,10 +143,12 @@ function msg(t){$("message").textContent=t}
 function toolMsg(t){$("toolMessage").textContent=t}
 
 function connectionCheck(){
-  if(!db){msg("Bağlantı kurulamadı. Sayfayı yenile.");return false}
+  if(!db){
+    msg("Bağlantı kurulamadı. Sayfayı yenile.");
+    return false;
+  }
   return true;
 }
-
 
 async function showDashboard(user){
   currentUser=user;
@@ -158,22 +160,15 @@ async function showDashboard(user){
 }
 
 async function loadCredits(){
+  if(!currentUser)return;
+
   const {data,error}=await db
     .from("user_credits")
     .select("credits")
     .eq("user_id",currentUser.id)
     .single();
-  console.log("KREDİ VERİSİ:",data);
-console.log("KREDİ HATASI:",error);
 
-  let balance=document.getElementById("creditBalance");
-
-  if(!balance){
-    balance=document.createElement("div");
-    balance.id="creditBalance";
-    balance.className="result";
-    $("welcome").appendChild(balance);
-  }
+  const balance=$("creditBalance");
 
   if(error){
     balance.textContent="Kredi bilgisi yüklenemedi: "+error.message;
@@ -182,8 +177,6 @@ console.log("KREDİ HATASI:",error);
 
   balance.innerHTML="🎁 Kalan deneme kredin: <b>"+data.credits+"</b>";
 }
-  
-  
 
 function showLogin(){
   currentUser=null;
@@ -206,30 +199,38 @@ $("signupTab").onclick=()=>{
 
 $("googleLogin").onclick=async()=>{
   if(!connectionCheck())return;
+
   msg("Google giriş sayfası açılıyor...");
+
   const {error}=await db.auth.signInWithOAuth({
     provider:"google",
     options:{redirectTo:window.location.origin}
   });
+
   if(error)msg(error.message);
 };
 
 $("authForm").onsubmit=async e=>{
   e.preventDefault();
   if(!connectionCheck())return;
+
   $("submit").disabled=true;
   msg("İşlem yapılıyor...");
+
   try{
     const email=$("email").value.trim();
     const password=$("password").value;
+
     const result=mode==="signup"
       ?await db.auth.signUp({email,password})
       :await db.auth.signInWithPassword({email,password});
+
     if(result.error)throw result.error;
+
     if(mode==="signup"&&!result.data.session){
       msg("Kayıt oluşturuldu. E-postanı doğrula, ardından giriş yap.");
     }else if(result.data.user){
-      showDashboard(result.data.user);
+      await showDashboard(result.data.user);
     }
   }catch(err){
     msg(err.message||"Bir hata oluştu.");
@@ -240,15 +241,21 @@ $("authForm").onsubmit=async e=>{
 
 $("logout").onclick=async()=>{
   if(!connectionCheck())return;
+
   const {error}=await db.auth.signOut();
-  if(error){msg(error.message);return}
+
+  if(error){
+    msg(error.message);
+    return;
+  }
+
   showLogin();
 };
 
 const tools={
   music:["AI Müzik","Şarkını oluşturmak için bilgileri doldur."],
   lyrics:["AI Şarkı Yazarı","Şarkı yazım projenin konusunu anlat."],
-  image:["AI Görsel","Oluşturmak istediğin görseli tarif et."],
+  image:["AI Görsel","Yapay zekâ ile gerçek görsel oluştur."],
   video:["AI Video","Oluşturmak istediğin videoyu tarif et."],
   projects:["Projelerim","Hesabına kaydedilen projeler."],
   account:["Hesabım","SESMOD hesap bilgilerin."]
@@ -256,6 +263,7 @@ const tools={
 
 window.openTool=async type=>{
   if(!currentUser||!connectionCheck()||!tools[type])return;
+
   editingProjectId=null;
   $("editor").classList.remove("hidden");
   $("toolTitle").textContent=tools[type][0];
@@ -263,7 +271,10 @@ window.openTool=async type=>{
   $("toolContent").innerHTML="";
   toolMsg("");
 
-  if(type==="projects"){await loadProjects();return}
+  if(type==="projects"){
+    await loadProjects();
+    return;
+  }
 
   if(type==="account"){
     $("toolContent").innerHTML=`
@@ -279,8 +290,10 @@ window.openTool=async type=>{
     $("toolContent").innerHTML=`
       <label>Şarkı adı</label>
       <input id="projectTitle" placeholder="Örn: Gurbet Yarası">
+
       <label>Şarkı sözleri</label>
       <textarea id="lyrics" rows="7" placeholder="Şarkı sözlerini buraya yaz..."></textarea>
+
       <label>Müzik tarzı</label>
       <select id="genre">
         <option>Modern Arabesk</option>
@@ -290,6 +303,7 @@ window.openTool=async type=>{
         <option>Arabesk Rock</option>
         <option>Türkçe Pop</option>
       </select>
+
       <label>Vokal</label>
       <select id="vocal">
         <option>Erkek vokal</option>
@@ -297,29 +311,54 @@ window.openTool=async type=>{
         <option>Erkek ve kadın düet</option>
         <option>Enstrümantal</option>
       </select>
+
       <label>Enstrümanlar</label>
       <input id="instruments" placeholder="Bağlama, klarnet, gitar...">
+
       <label>Duygu ve atmosfer</label>
       <input id="mood" placeholder="Hüzünlü, etkileyici, gurbet...">
+
       <label>Tempo</label>
       <select id="tempo">
-        <option>Yavaş</option><option>Orta</option><option>Hareketli</option>
+        <option>Yavaş</option>
+        <option>Orta</option>
+        <option>Hareketli</option>
       </select>
+
       <button class="primary full" onclick="buildMusicPrompt()">Müzik promptunu oluştur</button>
       <div id="musicResult"></div>`;
+    return;
+  }
+
+  if(type==="image"){
+    $("toolContent").innerHTML=`
+      <label>Proje başlığı</label>
+      <input id="projectTitle" placeholder="Örn: SESMOD albüm kapağı">
+
+      <label>Görsel açıklaması</label>
+      <textarea id="prompt" rows="5" placeholder="Nasıl bir görsel istiyorsun? Örneğin: Gün batımında sinematik bir Türk manzarası..."></textarea>
+
+      <p class="muted">Başarılı görsel üretimi 5 SESMOD deneme kredisi kullanır.</p>
+
+      <button class="primary full" id="generateImageButton" onclick="generateImage()">🎨 Gerçek görsel üret</button>
+
+      <div id="imageResult"></div>`;
     return;
   }
 
   $("toolContent").innerHTML=`
     <label>Proje başlığı</label>
     <input id="projectTitle" placeholder="Projenin adı">
+
     <label>İsteğini anlat</label>
     <textarea id="prompt" rows="5" placeholder="İsteğini buraya yaz..."></textarea>
+
     <button class="primary full" onclick="saveProject('${type}')">Projeyi kaydet</button>`;
 };
 
 async function loadProjects(){
   $("toolContent").textContent="Projeler yükleniyor...";
+
   const {data,error}=await db.from("projects")
     .select("id,title,project_type,project_data,created_at")
     .eq("user_id",currentUser.id)
@@ -329,6 +368,7 @@ async function loadProjects(){
     $("toolContent").textContent="Projeler yüklenemedi: "+error.message;
     return;
   }
+
   if(!data||data.length===0){
     $("toolContent").textContent="Henüz kayıtlı projen yok.";
     return;
@@ -349,30 +389,46 @@ window.openSavedProject=async id=>{
     .eq("user_id",currentUser.id)
     .single();
 
-  if(error){toolMsg("Proje açılamadı: "+error.message);return}
+  if(error){
+    toolMsg("Proje açılamadı: "+error.message);
+    return;
+  }
+
   if(!data)return;
 
   editingProjectId=data.id;
   const projectData=data.project_data||{};
+
   $("toolTitle").textContent=data.title;
   $("toolDescription").textContent="Kayıtlı proje bilgileri.";
+
   $("toolContent").innerHTML=`
     <label>Proje başlığı</label>
     <input id="editTitle" value="${escapeAttr(data.title)}">
+
     <label>Proje açıklaması / prompt</label>
     <textarea id="editPrompt" rows="7">${escapeText(projectData.prompt||projectData.lyrics||"")}</textarea>
+
+    ${projectData.image_url?'<img src="'+escapeAttr(projectData.image_url)+'" style="width:100%;border-radius:12px" alt="Kaydedilen görsel">':''}
+
     <div class="actions">
       <button class="primary" onclick="updateProject()">Değişiklikleri kaydet</button>
       <button class="danger" onclick="deleteProject()">Projeyi sil</button>
     </div>
+
     <button class="secondary full" onclick="openTool('projects')">← Projelerime dön</button>`;
 };
 
 window.updateProject=async()=>{
   if(!editingProjectId)return;
+
   const title=$("editTitle").value.trim();
   const prompt=$("editPrompt").value.trim();
-  if(!title){toolMsg("Proje başlığı boş olamaz.");return}
+
+  if(!title){
+    toolMsg("Proje başlığı boş olamaz.");
+    return;
+  }
 
   const {data:old,error:readError}=await db.from("projects")
     .select("project_data")
@@ -380,9 +436,13 @@ window.updateProject=async()=>{
     .eq("user_id",currentUser.id)
     .single();
 
-  if(readError){toolMsg("Proje okunamadı: "+readError.message);return}
+  if(readError){
+    toolMsg("Proje okunamadı: "+readError.message);
+    return;
+  }
 
   const updatedData={...(old.project_data||{}),prompt};
+
   const {error}=await db.from("projects")
     .update({title,project_data:updatedData})
     .eq("id",editingProjectId)
@@ -393,6 +453,7 @@ window.updateProject=async()=>{
 
 window.deleteProject=async()=>{
   if(!editingProjectId)return;
+
   if(!confirm("Bu projeyi silmek istediğine emin misin?"))return;
 
   const {error}=await db.from("projects")
@@ -400,7 +461,11 @@ window.deleteProject=async()=>{
     .eq("id",editingProjectId)
     .eq("user_id",currentUser.id);
 
-  if(error){toolMsg("Silme hatası: "+error.message);return}
+  if(error){
+    toolMsg("Silme hatası: "+error.message);
+    return;
+  }
+
   editingProjectId=null;
   toolMsg("Proje silindi.");
   await loadProjects();
@@ -415,7 +480,10 @@ window.buildMusicPrompt=()=>{
   const mood=$("mood").value.trim()||"Emotional and memorable";
   const tempo=$("tempo").value;
 
-  if(!title){toolMsg("Önce şarkı adını yaz.");return}
+  if(!title){
+    toolMsg("Önce şarkı adını yaz.");
+    return;
+  }
 
   lastMusicPrompt=[
     "Create an original Turkish song.",
@@ -434,12 +502,16 @@ window.buildMusicPrompt=()=>{
     <div class="result">
       <h3>Hazır müzik promptun</h3>
       <textarea id="generatedPrompt" rows="8" readonly></textarea>
+
       <h3>Şarkı sözlerin</h3>
       <textarea id="generatedLyrics" rows="7" readonly></textarea>
+
       <button class="secondary full" onclick="copyMusicPrompt()">Promptu kopyala</button>
       <button class="primary full" onclick="saveMusicProject()">Projeyi kaydet</button>
+
       <p class="muted">Bu metni müzik üretim aracında kullanabilirsin.</p>
     </div>`;
+
   $("generatedPrompt").value=lastMusicPrompt;
   $("generatedLyrics").value=lyrics;
   toolMsg("Müzik promptun hazır.");
@@ -448,6 +520,7 @@ window.buildMusicPrompt=()=>{
 window.copyMusicPrompt=async()=>{
   const text=$("generatedPrompt")?.value||lastMusicPrompt;
   if(!text)return;
+
   try{
     await navigator.clipboard.writeText(text);
     toolMsg("Prompt kopyalandı.");
@@ -458,13 +531,17 @@ window.copyMusicPrompt=async()=>{
 
 window.saveMusicProject=async()=>{
   if(!currentUser||!connectionCheck())return;
+
   const title=$("projectTitle").value.trim();
   const lyrics=$("lyrics").value.trim();
+
   if(!title||!lastMusicPrompt){
     toolMsg("Önce şarkı adını yazıp promptu oluştur.");
     return;
   }
+
   toolMsg("Proje kaydediliyor...");
+
   const {error}=await db.from("projects").insert({
     user_id:currentUser.id,
     title,
@@ -480,58 +557,118 @@ window.saveMusicProject=async()=>{
     },
     status:"draft"
   });
+
   toolMsg(error?"Kayıt hatası: "+error.message:"Müzik projen kaydedildi!");
+};
+
+window.generateImage=async()=>{
+  if(!currentUser||!connectionCheck())return;
+
+  const title=$("projectTitle").value.trim();
+  const prompt=$("prompt").value.trim();
+  const result=$("imageResult");
+  const button=$("generateImageButton");
+
+  if(!title||!prompt){
+    toolMsg("Proje başlığı ve görsel açıklaması gerekli.");
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="Görsel hazırlanıyor...";
+  result.innerHTML='<div class="result">Görselin hazırlanıyor. Lütfen bu sayfayı kapatma.</div>';
+  toolMsg("Görsel üretim isteği gönderiliyor...");
+
+  try{
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+
+    if(sessionError)throw sessionError;
+
+    if(!sessionData.session){
+      throw new Error("Oturum bulunamadı. Lütfen yeniden giriş yap.");
+    }
+
+    const response=await fetch(
+      SUPABASE_URL+"/functions/v1/sesmod-generate",
+      {
+        method:"POST",
+        headers:{
+          "Authorization":"Bearer "+sessionData.session.access_token,
+          "apikey":SUPABASE_KEY,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({prompt})
+      }
+    );
+
+    const payload=await response.json();
+
+    if(!response.ok||!payload.success){
+      throw new Error(payload.error||"Görsel üretilemedi.");
+    }
+
+    const {error:saveError}=await db.from("projects").insert({
+      user_id:currentUser.id,
+      title,
+      project_type:"image",
+      project_data:{
+        prompt,
+        image_url:payload.image_url
+      },
+      status:"completed"
+    });
+
+    result.innerHTML=`
+      <div class="result">
+        <h3>Görselin hazır! 🎉</h3>
+        <img src="${escapeAttr(payload.image_url)}"
+             alt="Üretilen görsel"
+             style="width:100%;border-radius:12px">
+
+        <p>Kullanılan kredi: <b>${escapeText(payload.credits_spent??5)}</b></p>
+        <p>Kalan kredi: <b>${escapeText(payload.remaining_credits??"")}</b></p>
+
+        <a href="${escapeAttr(payload.image_url)}"
+           target="_blank"
+           rel="noopener">Görseli yeni sekmede aç</a>
+
+        ${saveError
+          ?'<p class="muted">Görsel üretildi ancak proje kaydı yapılamadı: '+escapeText(saveError.message)+'</p>'
+          :'<p class="muted">Görsel projen kaydedildi.</p>'}
+      </div>`;
+
+    await loadCredits();
+    toolMsg("Görsel başarıyla üretildi.");
+
+  }catch(error){
+    result.innerHTML=`
+      <div class="result">
+        <h3>Üretim tamamlanamadı</h3>
+        <p>${escapeText(error.message)}</p>
+      </div>`;
+
+    toolMsg("Görsel üretimi başarısız. İşlem başarısızsa kredi düşülmemelidir.");
+
+  }finally{
+    button.disabled=false;
+    button.textContent="🎨 Gerçek görsel üret";
+  }
 };
 
 window.saveProject=async type=>{
   if(!currentUser||!connectionCheck())return;
+
   const title=$("projectTitle").value.trim();
   const prompt=$("prompt").value.trim();
+
   if(!title||!prompt){
     toolMsg("Proje başlığı ve açıklaması gerekli.");
     return;
   }
+
   toolMsg("Kaydediliyor...");
+
   const {error}=await db.from("projects").insert({
     user_id:currentUser.id,
     title,
-    project_type:type,
-    project_data:{prompt},
-    status:"draft"
-  });
-  toolMsg(error?"Kayıt hatası: "+error.message:"Projen kaydedildi!");
-};
-
-window.closeTool=()=>{
-  $("editor").classList.add("hidden");
-  editingProjectId=null;
-};
-
-function escapeText(s){
-  return String(s??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-function escapeAttr(s){return escapeText(s)}
-
-try{
-  if(window.supabase&&window.supabase.createClient){
-    db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    db.auth.getSession().then(({data,error})=>{
-      if(error){msg(error.message);return}
-      if(data.session?.user)showDashboard(data.session.user);
-    }).catch(err=>msg(err.message));
-
-    db.auth.onAuthStateChange((event,session)=>{
-      if(event==="SIGNED_OUT")showLogin();
-      else if(session?.user)showDashboard(session.user);
-    });
-  }else{
-    msg("Supabase kütüphanesi yüklenemedi. Sayfayı yenile.");
-  }
-}catch(err){
-  msg("Bağlantı hatası: "+err.message);
-}
-</script>
-</body>
-</html>
+    proje
