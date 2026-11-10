@@ -2068,6 +2068,20 @@ function renderAccountPage(){
 
   <div class="section">
 
+   <h3>SESMOD API bağlantısı</h3>
+
+   <p>Giriş yaptığın hesabın güvenli API erişimini kontrol et.</p>
+
+   <button class="btn" onclick="testSesmodApi()">
+    API Bağlantısını Test Et
+   </button>
+
+   <p id="sesmodApiResult" class="status" style="white-space:pre-wrap"></p>
+
+  </div>
+
+  <div class="section">
+
    <h3>Hesap işlemleri</h3>
 
    <button class="btn btn-secondary"
@@ -2093,6 +2107,61 @@ function renderAccountPage(){
 
   document.getElementById("accountCredits")
   .textContent=currentCredits;
+
+ }
+
+}
+
+// =====================================
+// SESMOD API BAĞLANTI TESTİ
+// =====================================
+
+async function testSesmodApi(){
+
+ const result=document.getElementById("sesmodApiResult");
+ if(!result || !db){
+  alert("Uygulama bağlantısı hazır değil.");
+  return;
+ }
+
+ result.textContent="API kontrol ediliyor...";
+
+ try{
+
+  const {data,error}=await db.auth.getSession();
+  if(error)throw error;
+  if(!data.session || !data.session.access_token){
+   throw new Error("Aktif oturum bulunamadı. Yeniden giriş yap.");
+  }
+
+  const response=await fetch(
+   SUPABASE_URL+"/functions/v1/sesmod-api",
+   {
+    method:"GET",
+    headers:{
+     "Authorization":"Bearer "+data.session.access_token,
+     "apikey":SUPABASE_ANON_KEY
+    }
+   }
+  );
+
+  const payload=await response.json();
+
+  if(!response.ok){
+   throw new Error("HTTP "+response.status+": "+(payload.error || "API isteği başarısız"));
+  }
+
+  result.textContent=
+   "BAŞARILI ✓\\n"+
+   "Servis: "+payload.service+"\\n"+
+   "Sürüm: "+payload.version+"\\n"+
+   "Oturum doğrulandı: "+payload.authenticated+"\\n"+
+   "Kullanıcı ID: "+payload.user_id+"\\n"+
+   "Not: "+payload.note;
+
+ }catch(error){
+
+  result.textContent="BAĞLANTI HATASI: "+error.message;
 
  }
 
