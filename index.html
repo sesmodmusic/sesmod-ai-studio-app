@@ -375,6 +375,69 @@ footer{
   font-size:19px;
  }
 }
+
+/* SESMOD CREATIVE REDESIGN */
+:root{color-scheme:dark;--bg:#090a10;--surface:#11131d;--surface2:#171a27;--line:rgba(177,157,255,.16);--muted:#9a9db1;--purple:#a78bfa;--cyan:#63d8e8}
+body{background:radial-gradient(ellipse at 12% 0%,rgba(95,65,173,.18),transparent 34%),radial-gradient(ellipse at 90% 22%,rgba(39,118,145,.10),transparent 28%),#090a10;color:#f7f7fb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;letter-spacing:.01em}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 80%);z-index:-1}
+header{background:rgba(12,13,21,.84);backdrop-filter:blur(18px);border-bottom:1px solid rgba(177,157,255,.13);padding:15px max(20px,calc((100vw - 1360px)/2));box-shadow:0 10px 40px rgba(0,0,0,.18)}
+.logo{font-size:21px;letter-spacing:3px;color:#f3edff;text-shadow:0 0 24px rgba(167,139,250,.3)}
+.logo:before{content:"✦";display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;border-radius:10px;background:linear-gradient(135deg,#a78bfa,#54c7d8);color:#090a10;font-size:17px;vertical-align:middle}
+.logo span{margin-left:40px;font-size:9px;letter-spacing:4px;color:#8f91a8}
+.container{max-width:1360px;padding:24px}
+.credit{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);color:#d8caff;border-radius:999px;padding:10px 16px;font-weight:700}
+.btn{background:linear-gradient(135deg,#9b7cf3,#7256d8);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:12px 18px;box-shadow:0 7px 22px rgba(111,78,206,.18);transition:transform .18s,filter .18s,box-shadow .18s}
+.btn:hover{opacity:1;filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 10px 26px rgba(111,78,206,.28)}
+.btn-secondary{background:#202332;border:1px solid #34394d;box-shadow:none}
+.btn-danger{background:#542b3b;border:1px solid #754053;box-shadow:none}
+.welcome{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:1.3fr .7fr;align-items:center;min-height:265px;padding:36px 40px 58px;margin-bottom:26px;border:1px solid rgba(167,139,250,.25);border-radius:23px;background:radial-gradient(ellipse at 80% 50%,rgba(104,82,191,.26),transparent 38%),linear-gradient(115deg,#191a2a 0%,#171629 55%,#10212a 100%);box-shadow:0 22px 70px rgba(0,0,0,.25)}
+.welcome:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 40%,rgba(100,212,225,.045) 100%)}
+.welcome-copy{position:relative;z-index:2}
+.eyebrow{display:flex;align-items:center;gap:9px;color:#bcb2e9;font-size:10px;font-weight:800;letter-spacing:2.4px;margin-bottom:17px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#70e0c0;box-shadow:0 0 12px #70e0c0}
+.welcome h1{font-size:clamp(29px,4vw,48px);line-height:1.08;letter-spacing:-1.8px;margin:0 0 13px;color:#fff}
+.welcome h1 span{background:linear-gradient(90deg,#c4a9ff,#75dce8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.welcome p{font-size:15px;max-width:520px;color:#b4b6c8}
+.welcome-user{display:inline-flex;align-items:center;gap:9px;margin-top:22px;padding:8px 13px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.045);color:#d2d3e0;font-size:12px}
+.user-mark{color:#c4a9ff}
+.welcome-art{height:170px;position:relative;display:grid;place-items:center}
+.art-orbit{position:absolute;border:1px solid rgba(160,145,255,.24);border-radius:50%;transform:rotate(-25deg)}
+.orbit-one{width:230px;height:100px}.orbit-two{width:190px;height:145px;transform:rotate(48deg);border-color:rgba(99,216,232,.2)}
+.art-core{width:92px;height:92px;display:grid;place-items:center;border-radius:28px;background:linear-gradient(145deg,#b79bff,#6554c8 55%,#3e9cac);box-shadow:0 0 55px rgba(144,112,255,.38),inset 0 1px 1px rgba(255,255,255,.55);font-size:38px;font-weight:950;color:#fff;transform:rotate(-8deg)}
+.art-core span{font-size:21px;margin-left:2px}
+.wave-bars{position:absolute;bottom:4px;display:flex;align-items:center;gap:4px;height:35px;opacity:.7}
+.wave-bars i{display:block;width:3px;border-radius:8px;background:linear-gradient(#b89aff,#5bd4df);height:var(--h,15px)}
+.wave-bars i:nth-child(3n){--h:27px}.wave-bars i:nth-child(3n+1){--h:12px}.wave-bars i:nth-child(4n){--h:32px}.wave-bars i:nth-child(5n){--h:20px}
+.welcome-bottom{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:13px 22px;border-top:1px solid rgba(255,255,255,.08);font-size:9px;font-weight:800;letter-spacing:1.8px;color:#85879e}
+.welcome-bottom b{color:#a78bfa;margin:0 5px}
+.nav{gap:8px;padding:8px;margin-bottom:24px;border:1px solid rgba(255,255,255,.07);border-radius:15px;background:rgba(17,19,29,.78);backdrop-filter:blur(12px)}
+.nav button{background:transparent;border:1px solid transparent;color:#aeb0c2;padding:11px 16px;border-radius:10px;font-size:13px;transition:.18s}
+.nav button:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav button.active{background:linear-gradient(135deg,rgba(155,124,243,.23),rgba(84,199,216,.1));border-color:rgba(167,139,250,.28);color:#e8ddff;box-shadow:inset 0 0 18px rgba(167,139,250,.06)}
+h2{font-size:20px;letter-spacing:-.4px;color:#f0edfa}
+.section-header{margin-bottom:17px}
+.grid{gap:16px}
+.tool-card,.card,.panel,.auth-card{background:linear-gradient(145deg,rgba(24,27,41,.96),rgba(16,18,29,.98));border:1px solid rgba(166,153,219,.15);border-radius:17px;box-shadow:0 12px 35px rgba(0,0,0,.14)}
+.tool-card{position:relative;overflow:hidden;min-height:165px;padding:22px;transition:transform .2s,border-color .2s,background .2s}
+.tool-card:after{content:"";position:absolute;width:110px;height:110px;right:-50px;top:-55px;border-radius:50%;background:rgba(167,139,250,.09);filter:blur(3px);transition:.2s}
+.tool-card:hover{border-color:rgba(167,139,250,.55);transform:translateY(-4px);background:linear-gradient(145deg,#22233a,#151b29)}
+.tool-card:hover:after{transform:scale(1.6)}
+.tool-icon{display:grid;place-items:center;width:48px;height:48px;margin-bottom:17px;border:1px solid rgba(167,139,250,.18);border-radius:14px;background:linear-gradient(145deg,rgba(167,139,250,.17),rgba(99,216,232,.08));font-size:24px}
+.tool-card h3{color:#eee9ff;font-size:16px}
+.tool-card p{font-size:12px;color:#9699ad;max-width:250px}
+.panel{padding:25px}
+input,textarea,select{background:#0d0f18;border:1px solid #303449;border-radius:10px;color:#f7f7fb}
+input:focus,textarea:focus,select:focus{border-color:#a78bfa;box-shadow:0 0 0 3px rgba(167,139,250,.1)}
+label{color:#c7c8d7;font-weight:600;font-size:12px;letter-spacing:.2px}
+.project-item{background:#171a27;border:1px solid #303449;border-radius:12px}
+.status{color:#a9dce4}
+footer{color:#666b80;letter-spacing:1px}
+.auth-screen{background:radial-gradient(ellipse at 50% 0%,rgba(114,86,216,.2),transparent 45%)}
+.auth-card{padding:34px}
+.auth-logo{letter-spacing:4px;text-shadow:0 0 28px rgba(167,139,250,.35)}
+@media(max-width:750px){header{padding:12px 14px}.container{padding:14px}.welcome{grid-template-columns:1fr;min-height:250px;padding:27px 22px 57px}.welcome-art{position:absolute;right:-35px;top:25px;width:180px;opacity:.48;transform:scale(.85)}.welcome-copy{max-width:75%}.welcome h1{font-size:30px}.welcome p{font-size:13px}.nav{overflow-x:auto;flex-wrap:nowrap;padding:7px}.nav button{white-space:nowrap;padding:10px 13px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tool-card{padding:16px;min-height:155px}.welcome-bottom{font-size:8px;letter-spacing:1px;padding:12px}}
+@media(max-width:450px){.grid{grid-template-columns:1fr}.welcome-copy{max-width:100%}.welcome-art{right:-60px;top:38px;opacity:.25}.welcome h1{font-size:28px}.header-right{gap:6px}.logo{font-size:17px}.logo:before{width:26px;height:26px;margin-right:6px}.logo span{margin-left:32px}.credit{font-size:10px;padding:8px 10px}.header-right .btn{padding:9px 10px;font-size:11px}.welcome-bottom span:last-child{display:none}}
+
 </style>
 </head>
 
@@ -483,11 +546,18 @@ footer{
 
  <div class="welcome">
 
-  <h1>SESMOD AI STUDIO'YA HOŞ GELDİN</h1>
-
-  <p>Yaratıcılığını üretime dönüştür.</p>
-
-  <p id="userEmail" style="margin-top:10px"></p>
+  <div class="welcome-copy">
+   <div class="eyebrow"><span class="live-dot"></span> SESMOD CREATIVE WORKSPACE</div>
+   <h1>Fikrini <span>üretime</span> dönüştür.</h1>
+   <p>Müziğini, görsellerini ve videolarını tek bir yaratıcı stüdyoda tasarla.</p>
+   <div class="welcome-user"><span class="user-mark">✦</span><span id="userEmail"></span></div>
+  </div>
+  <div class="welcome-art" aria-hidden="true">
+   <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+   <div class="art-core">S<span>♪</span></div>
+   <div class="wave-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="welcome-bottom"><span>YARATICILIĞININ SINIRI YOK</span><span>SESMOD AI STUDIO <b>·</b> 2026</span></div>
 
  </div>
 
