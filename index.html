@@ -452,7 +452,7 @@ footer{
  <div class="header-right">
 
   <div class="credit">
-   Kredi: <strong id="creditCount">50</strong>
+   Kredi: <strong id="creditCount">--</strong>
   </div>
 
   <button class="btn btn-secondary"
@@ -623,7 +623,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
 
 let db = null;
 let currentUser = null;
-let currentCredits = 50;
+let currentCredits = 0;
 let currentPage = "home";
 let authMode = "login";
 
@@ -997,53 +997,47 @@ function showPage(page,button){
 }
 
 // =====================================
+// =====================================
 // KREDİ SİSTEMİ
 // =====================================
 
 async function loadUserCredits(){
 
- if(!currentUser)return;
+ if(!currentUser || !db)return;
 
  try{
 
   const {data,error}=await db
-  .from("profiles")
+  .from("user_credits")
   .select("credits")
-  .eq("id",currentUser.id)
+  .eq("user_id",currentUser.id)
   .maybeSingle();
 
-  if(error){
+  if(error)throw error;
 
-   console.log("Kredi tablosu:",error.message);
-
-   return;
-
+  if(!data){
+   throw new Error("Kredi hesabı bulunamadı. Lütfen destek ekibiyle iletişime geç.");
   }
 
-  if(data && data.credits!==null){
-
-   currentCredits=Number(data.credits);
-
-  }else{
-
-   currentCredits=50;
-
-  }
-
+  currentCredits=Number(data.credits);
   updateCreditDisplay();
 
  }catch(error){
 
-  console.error(error);
+  console.error("Kredi yükleme hatası:",error);
+  currentCredits=0;
+  updateCreditDisplay();
 
  }
-
 }
 
 function updateCreditDisplay(){
 
- document.getElementById("creditCount")
- .textContent=currentCredits;
+ const headerCredit=document.getElementById("creditCount");
+ if(headerCredit)headerCredit.textContent=currentCredits;
+
+ const accountCredit=document.getElementById("accountCredits");
+ if(accountCredit)accountCredit.textContent=currentCredits;
 
 }
 
@@ -1055,115 +1049,50 @@ async function spendCredits(amount){
 
  amount=Number(amount);
 
- if(!Number.isFinite(amount) || amount<=0){
+ if(!Number.isInteger(amount) || amount<=0){
+  alert("Geçersiz kredi miktarı.");
+  return false;
+ }
+
+ if(!currentUser || !db){
+  alert("Önce giriş yapmalısın.");
   return false;
  }
 
  if(currentCredits<amount){
-
   alert("Yeterli kredin bulunmuyor.");
-
   return false;
-
  }
-
- if(!currentUser || !db){
-
-  alert("Önce giriş yapmalısın.");
-
-  return false;
-
- }
-
- const newCredits=currentCredits-amount;
 
  try{
 
-  const {data,error}=await db
-  .from("profiles")
-  .update({
-   credits:newCredits
-  })
-  .eq("id",currentUser.id)
-  .select("credits")
-  .maybeSingle();
+  // Kredi düşürme işlemi güvenli Supabase fonksiyonunda yapılır.
+  const {data,error}=await db.rpc("spend_credits",{
+   p_amount:amount
+  });
 
   if(error)throw error;
 
-  if(!data){
-
-   alert("Kredi kaydı güncellenemedi.");
-
-   return false;
-
+  if(data===null || data===undefined){
+   throw new Error("Sunucudan yeni kredi bakiyesi alınamadı.");
   }
 
-  currentCredits=Number(data.credits);
-
+  currentCredits=Number(data);
   updateCreditDisplay();
-
   return true;
 
  }catch(error){
 
-  console.error(error);
-
-  alert("Kredi güncellenemedi: "+error.message);
-
+  console.error("Kredi harcama hatası:",error);
+  await loadUserCredits();
+  alert("Kredi harcanamadı: "+error.message);
   return false;
 
  }
-
 }
 
-// =====================================
-// KREDİ EKLEME
-// =====================================
 
-async function addCredits(amount){
 
- amount=Number(amount);
-
- if(!Number.isFinite(amount) || amount<=0){
-  return false;
- }
-
- if(!currentUser || !db)return false;
-
- const newCredits=currentCredits+amount;
-
- try{
-
-  const {data,error}=await db
-  .from("profiles")
-  .update({
-   credits:newCredits
-  })
-  .eq("id",currentUser.id)
-  .select("credits")
-  .maybeSingle();
-
-  if(error)throw error;
-
-  if(!data)return false;
-
-  currentCredits=Number(data.credits);
-
-  updateCreditDisplay();
-
-  return true;
-
- }catch(error){
-
-  console.error(error);
-
-  return false;
-
- }
-
-}
-
-// =====================================
 // UYGULAMA BAŞLAT
 // =====================================
 
@@ -2075,7 +2004,7 @@ function renderAccountPage(){
 
    <p style="margin-top:15px">Mevcut kredin</p>
 
-   <h2 id="accountCredits">50</h2>
+   <h2 id="accountCredits">--</h2>
 
   </div>
 
