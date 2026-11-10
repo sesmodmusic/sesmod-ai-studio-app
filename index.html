@@ -9,1136 +9,2275 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
 }
 
-body {
-  background: #101018;
-  color: #f7f7fb;
-  font-family: Arial, Helvetica, sans-serif;
-  min-height: 100vh;
+body{
+ background:#101018;
+ color:#f7f7fb;
+ font-family:Arial,sans-serif;
+ min-height:100vh;
 }
 
-button, input, textarea, select {
-  font: inherit;
+button,input,textarea,select{
+ font:inherit;
 }
 
-button {
-  cursor: pointer;
+button{
+ cursor:pointer;
 }
 
-.hidden {
-  display: none !important;
+.hidden{
+ display:none!important;
 }
 
-header {
-  min-height: 72px;
-  padding: 15px 5%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  background: #171722;
-  border-bottom: 1px solid #303044;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+.container{
+ width:100%;
+ max-width:1200px;
+ margin:auto;
+ padding:20px;
 }
 
-.logo {
-  font-size: 23px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: #fff;
+header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:18px 22px;
+ background:#191925;
+ border-bottom:1px solid #303044;
+ position:sticky;
+ top:0;
+ z-index:10;
 }
 
-.logo span {
-  color: #a78bfa;
+.logo{
+ font-size:23px;
+ font-weight:900;
+ letter-spacing:2px;
+ color:#b58aff;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.logo span{
+ display:block;
+ font-size:11px;
+ letter-spacing:5px;
+ color:#aaa;
+ margin-top:4px;
 }
 
-.credit {
-  background: #29233f;
-  color: #c4b5fd;
-  border: 1px solid #6850a8;
-  padding: 9px 13px;
-  border-radius: 20px;
-  font-size: 13px;
+.header-right{
+ display:flex;
+ align-items:center;
+ gap:12px;
 }
 
-.container {
-  width: min(1100px, 92%);
-  margin: 35px auto;
+.credit{
+ background:#29223b;
+ padding:9px 13px;
+ border-radius:20px;
+ color:#d2b5ff;
+ font-size:13px;
 }
 
-.auth-screen {
-  width: min(430px, 92%);
-  margin: 65px auto;
-  padding: 30px;
-  background: #191925;
-  border: 1px solid #353548;
-  border-radius: 18px;
-  box-shadow: 0 15px 50px #0005;
+.btn{
+ border:0;
+ border-radius:9px;
+ padding:12px 17px;
+ font-weight:bold;
+ color:white;
+ background:#8255df;
 }
 
-.auth-logo {
-  text-align: center;
-  margin-bottom: 25px;
+.btn:hover{
+ opacity:.85;
 }
 
-.auth-logo h1 {
-  font-size: 29px;
-  letter-spacing: 2px;
+.btn-secondary{
+ background:#303044;
 }
 
-.auth-logo h1 span {
-  color: #a78bfa;
+.btn-danger{
+ background:#a83e52;
 }
 
-.auth-logo p {
-  color: #aaa9bd;
-  margin-top: 8px;
-  font-size: 13px;
+.card{
+ background:#1b1b29;
+ border:1px solid #343447;
+ border-radius:15px;
+ padding:20px;
 }
 
-.auth-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 22px;
+h1{
+ font-size:27px;
+ margin-bottom:12px;
 }
 
-.auth-tabs button {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #414157;
-  border-radius: 9px;
-  background: #222231;
-  color: #bbb;
+h2{
+ font-size:21px;
+ margin-bottom:15px;
 }
 
-.auth-tabs button.active {
-  background: #7653cf;
-  color: white;
-  border-color: #7653cf;
+h3{
+ font-size:17px;
+ margin-bottom:9px;
 }
 
-.field {
-  margin-bottom: 16px;
+p{
+ color:#aaaabb;
+ line-height:1.6;
 }
 
-.field label {
-  display: block;
-  margin-bottom: 7px;
-  font-size: 13px;
-  color: #c8c7d8;
+input,textarea,select{
+ width:100%;
+ background:#11111c;
+ color:white;
+ border:1px solid #414155;
+ border-radius:9px;
+ padding:13px;
+ outline:none;
+ margin-top:8px;
+ margin-bottom:14px;
 }
 
-.field input,
-.field textarea,
-.field select {
-  width: 100%;
-  padding: 13px;
-  border: 1px solid #414157;
-  border-radius: 9px;
-  background: #11111b;
-  color: white;
-  outline: none;
+input:focus,textarea:focus,select:focus{
+ border-color:#a77aff;
 }
 
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
-  border-color: #a78bfa;
+textarea{
+ min-height:130px;
+ resize:vertical;
 }
 
-.primary-btn {
-  width: 100%;
-  padding: 14px;
-  border: 0;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #8058e8, #5736ad);
-  color: white;
-  font-weight: bold;
-  margin-top: 5px;
+label{
+ display:block;
+ color:#d5d5e2;
+ font-size:14px;
+ margin-top:10px;
 }
 
-.primary-btn:disabled {
-  opacity: .5;
-  cursor: not-allowed;
+.auth-screen{
+ min-height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ padding:20px;
 }
 
-.google-btn {
-  width: 100%;
-  padding: 13px;
-  margin-top: 12px;
-  border: 1px solid #55556b;
-  border-radius: 9px;
-  background: #252532;
-  color: white;
+.auth-card{
+ width:100%;
+ max-width:420px;
+ background:#1b1b29;
+ border:1px solid #39394d;
+ padding:28px;
+ border-radius:18px;
 }
 
-.auth-message {
-  min-height: 22px;
-  margin-top: 14px;
-  color: #fca5a5;
-  font-size: 13px;
-  text-align: center;
+.auth-logo{
+ text-align:center;
+ font-size:30px;
+ font-weight:900;
+ color:#b58aff;
+ margin-bottom:8px;
 }
 
-.app-welcome {
-  margin-bottom: 28px;
+.auth-subtitle{
+ text-align:center;
+ margin-bottom:25px;
 }
 
-.app-welcome h1 {
-  font-size: clamp(23px, 4vw, 34px);
-  margin-bottom: 9px;
+.auth-tabs{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin-bottom:20px;
 }
 
-.app-welcome p {
-  color: #aaa9bd;
-  line-height: 1.6;
+.auth-tabs button{
+ background:#29293a;
+ border:0;
+ color:white;
+ padding:12px;
+ border-radius:9px;
 }
 
-.user-email {
-  color: #c4b5fd;
-  margin-top: 10px;
-  font-size: 13px;
+.auth-tabs button.active{
+ background:#8255df;
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 17px;
+#message{
+ padding:10px;
+ border-radius:8px;
+ font-size:13px;
+ margin-bottom:12px;
+ display:none;
 }
 
-.tool-card {
-  min-height: 155px;
-  padding: 22px;
-  background: #1b1b29;
-  border: 1px solid #343447;
-  border-radius: 15px;
-  transition: .2s;
-  cursor: pointer;
+#message.show{
+ display:block;
+ background:#302440;
+ color:#e2caff;
 }
 
-.tool-card:hover {
-  transform: translateY(-3px);
-  border-color: #9270e8;
-  background: #222033;
+.dashboard{
+ padding-top:25px;
 }
 
-.tool-icon {
-  font-size: 30px;
-  margin-bottom: 14px;
+.welcome{
+ background:linear-gradient(120deg,#28203c,#1b1b29);
+ border:1px solid #51416e;
+ border-radius:17px;
+ padding:25px;
+ margin-bottom:22px;
 }
 
-.tool-card h3 {
-  font-size: 17px;
-  margin-bottom: 8px;
+.welcome h1{
+ color:#d6baff;
 }
 
-.tool-card p {
-  color: #aaa9bd;
-  font-size: 13px;
-  line-height: 1.5;
+.grid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:15px;
 }
 
-.panel {
-  margin-top: 25px;
-  padding: 23px;
-  background: #1b1b29;
-  border: 1px solid #343447;
-  border-radius: 15px;
+.tool-card{
+ background:#1b1b29;
+ border:1px solid #343447;
+ border-radius:14px;
+ padding:20px;
+ cursor:pointer;
+ transition:.2s;
 }
 
-.panel h2 {
-  margin-bottom: 18px;
-  font-size: 21px;
+.tool-card:hover{
+ border-color:#a77aff;
+ transform:translateY(-3px);
 }
 
-.panel textarea {
-  width: 100%;
-  min-height: 130px;
-  resize: vertical;
-  padding: 14px;
-  color: white;
-  background: #11111b;
-  border: 1px solid #414157;
-  border-radius: 9px;
-  outline: none;
+.tool-icon{
+ font-size:32px;
+ margin-bottom:13px;
 }
 
-.panel textarea:focus {
-  border-color: #a78bfa;
+.tool-card h3{
+ color:#e1d2ff;
 }
 
-.panel select,
-.panel input {
-  width: 100%;
-  padding: 12px;
-  background: #11111b;
-  color: white;
-  border: 1px solid #414157;
-  border-radius: 9px;
+.tool-card p{
+ font-size:13px;
 }
 
-.result-box {
-  margin-top: 18px;
-  padding: 17px;
-  background: #11111b;
-  border: 1px solid #45405e;
-  border-radius: 10px;
-  white-space: pre-wrap;
-  line-height: 1.7;
-  overflow-wrap: anywhere;
+.section{
+ margin-top:22px;
 }
 
-.project-item {
-  padding: 15px;
-  margin-bottom: 10px;
-  background: #11111b;
-  border: 1px solid #38384c;
-  border-radius: 10px;
+.section-header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin-bottom:15px;
 }
 
-.project-item h3 {
-  margin-bottom: 6px;
+.panel{
+ background:#1b1b29;
+ border:1px solid #343447;
+ padding:22px;
+ border-radius:15px;
 }
 
-.project-item p {
-  color: #aaa9bd;
-  font-size: 12px;
+.action-row{
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap;
+ margin-top:12px;
 }
 
-.secondary-btn {
-  padding: 10px 14px;
-  background: #29233f;
-  color: #d6c9ff;
-  border: 1px solid #6850a8;
-  border-radius: 8px;
+.project-item{
+ background:#252536;
+ border:1px solid #414155;
+ padding:15px;
+ border-radius:10px;
+ margin-bottom:10px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
 }
 
-.danger-btn {
-  padding: 10px 14px;
-  background: #402027;
-  color: #ffb4b4;
-  border: 1px solid #82404b;
-  border-radius: 8px;
+.project-item small{
+ color:#aaa;
 }
 
-.footer {
-  text-align: center;
-  color: #77778c;
-  font-size: 12px;
-  padding: 30px 10px;
+.nav{
+ display:flex;
+ flex-wrap:wrap;
+ gap:9px;
+ margin-bottom:20px;
 }
 
-@media(max-width: 750px) {
-  .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.nav button{
+ background:#252536;
+ border:1px solid #414155;
+ color:white;
+ padding:11px 15px;
+ border-radius:9px;
 }
 
-@media(max-width: 480px) {
-  header {
-    padding: 13px 4%;
-  }
+.nav button.active{
+ background:#8255df;
+ border-color:#8255df;
+}
 
-  .logo {
-    font-size: 18px;
-  }
+.status{
+ color:#bba0ff;
+ font-size:13px;
+ margin-top:10px;
+}
 
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
+footer{
+ text-align:center;
+ color:#777;
+ font-size:12px;
+ padding:35px 10px;
+}
 
-  .auth-screen {
-    padding: 22px;
-    margin-top: 35px;
-  }
+@media(max-width:750px){
+ .grid{
+  grid-template-columns:repeat(2,1fr);
+ }
+ header{
+  padding:14px;
+ }
+ .container{
+  padding:13px;
+ }
+ h1{
+  font-size:22px;
+ }
+}
 
-  .container {
-    margin-top: 25px;
-  }
+@media(max-width:450px){
+ .grid{
+  grid-template-columns:1fr;
+ }
+ .header-right{
+  gap:6px;
+ }
+ .credit{
+  font-size:11px;
+  padding:8px;
+ }
+ .logo{
+  font-size:19px;
+ }
 }
 </style>
 </head>
+
 <body>
 
-<header id="appHeader" class="hidden">
-  <div class="logo">SESMOD <span>AI STUDIO</span></div>
+<!-- GİRİŞ VE KAYIT EKRANI -->
 
-  <div class="header-right">
-    <div class="credit">Kredi: <strong id="creditCount">50</strong></div>
-    <button class="secondary-btn" onclick="logout()">Çıkış Yap</button>
-  </div>
-</header>
+<div id="authScreen" class="auth-screen">
 
-<!-- GİRİŞ EKRANI -->
-<section id="authScreen" class="auth-screen">
+ <div class="auth-card">
 
-  <div class="auth-logo">
-    <h1>SESMOD <span>AI STUDIO</span></h1>
-    <p>SESMOD hesabına giriş yap</p>
-  </div>
+  <div class="auth-logo">SESMOD</div>
+
+  <p class="auth-subtitle">
+   AI STUDIO · Yaratıcılığını üretime dönüştür
+  </p>
 
   <div class="auth-tabs">
-    <button id="loginTab" class="active" onclick="setAuthMode('login')">
-      Giriş Yap
-    </button>
 
-    <button id="registerTab" onclick="setAuthMode('register')">
-      Hesap Oluştur
-    </button>
+   <button id="loginTab" class="active"
+   onclick="showAuth('login')">
+   Giriş Yap
+   </button>
+
+   <button id="registerTab"
+   onclick="showAuth('register')">
+   Hesap Oluştur
+   </button>
+
   </div>
 
-  <div class="field">
-    <label>E-posta</label>
-    <input
-      type="email"
-      id="email"
-      placeholder="E-posta adresin"
-      autocomplete="email"
-    >
-  </div>
+  <div id="message"></div>
 
-  <div class="field">
-    <label>Şifre</label>
-    <input
-      type="password"
-      id="password"
-      placeholder="Şifren"
-      autocomplete="current-password"
-    >
-  </div>
+  <label>E-posta</label>
 
-  <button class="primary-btn" id="authButton" onclick="handleAuth()">
-    Giriş Yap
+  <input
+   type="email"
+   id="email"
+   placeholder="E-posta adresin">
+
+  <label>Şifre</label>
+
+  <input
+   type="password"
+   id="password"
+   placeholder="Şifren">
+
+  <button
+   class="btn"
+   id="authButton"
+   style="width:100%"
+   onclick="handleAuth()">
+   Giriş Yap
   </button>
 
-  <button class="google-btn" onclick="googleLogin()">
-    Google ile Devam Et
-  </button>
+  <p style="text-align:center;margin-top:18px;font-size:12px">
+   SESMOD AI STUDIO
+  </p>
 
-  <div id="authMessage" class="auth-message"></div>
+ </div>
 
-</section>
+</div>
 
 <!-- ANA UYGULAMA -->
-<main id="appScreen" class="container hidden">
 
-  <section class="app-welcome">
-    <h1>SESMOD AI STUDIO'YA HOŞ GELDİN</h1>
+<div id="appScreen" class="hidden">
 
-    <p>Yaratıcılığını üretime dönüştür.</p>
+<header>
 
-    <div class="user-email" id="userEmail"></div>
-  </section>
+ <div class="logo">
+  SESMOD
+  <span>AI STUDIO</span>
+ </div>
 
-  <!-- ANA MENÜ -->
-  <section class="dashboard-grid">
+ <div class="header-right">
 
-    <div class="tool-card" onclick="openTool('music')">
-      <div class="tool-icon">🎵</div>
-      <h3>AI Müzik</h3>
-      <p>Şarkı fikri ve müzik üretim promptu hazırla.</p>
-    </div>
+  <div class="credit">
+   Kredi: <strong id="creditCount">50</strong>
+  </div>
 
-    <div class="tool-card" onclick="openTool('lyrics')">
-      <div class="tool-icon">✍️</div>
-      <h3>Şarkı Sözleri</h3>
-      <p>Şarkı sözlerini oluştur, düzenle ve kaydet.</p>
-    </div>
+  <button class="btn btn-secondary"
+  onclick="logout()">
+   Çıkış Yap
+  </button>
 
-    <div class="tool-card" onclick="openTool('image')">
-      <div class="tool-icon">🎨</div>
-      <h3>AI Görsel</h3>
-      <p>Görsel üretimi için yaratıcı prompt hazırla.</p>
-    </div>
+ </div>
 
-    <div class="tool-card" onclick="openTool('video')">
-      <div class="tool-icon">🎬</div>
-      <h3>AI Video</h3>
-      <p>Video ve klip üretimi için prompt hazırla.</p>
-    </div>
+</header>
 
-    <div class="tool-card" onclick="openProjects()">
-      <div class="tool-icon">📁</div>
-      <h3>Projelerim</h3>
-      <p>Kaydettiğin çalışmalarını görüntüle.</p>
-    </div>
+<main class="container dashboard">
 
-    <div class="tool-card" onclick="openAccount()">
-      <div class="tool-icon">👤</div>
-      <h3>Hesabım</h3>
-      <p>Hesap bilgilerini ve kredi durumunu görüntüle.</p>
-    </div>
+ <div class="welcome">
 
-  </section>
+  <h1>SESMOD AI STUDIO'YA HOŞ GELDİN</h1>
 
-  <!-- ÜRETİM PANELİ -->
-  <section id="toolPanel" class="panel hidden">
+  <p>Yaratıcılığını üretime dönüştür.</p>
 
-    <h2 id="toolTitle">AI Üretim</h2>
+  <p id="userEmail" style="margin-top:10px"></p>
 
-    <div class="field">
-      <label>Proje başlığı</label>
-      <input
-        id="projectTitle"
-        type="text"
-        placeholder="Projenin adını yaz"
-      >
-    </div>
+ </div>
 
-    <div class="field">
-      <label>Tür / Stil</label>
-      <select id="projectStyle">
-        <option value="Arabesk">Arabesk</option>
-        <option value="Pop">Pop</option>
-        <option value="Rock">Rock</option>
-        <option value="Türkü">Türkü</option>
-        <option value="Rap">Rap</option>
-        <option value="Elektronik">Elektronik</option>
-        <option value="Sinematik">Sinematik</option>
-        <option value="Serbest">Serbest</option>
-      </select>
-    </div>
+ <div class="nav">
 
-    <div class="field">
-      <label>Proje açıklaması ve fikirlerin</label>
-      <textarea
-        id="projectDescription"
-        placeholder="Nasıl bir çalışma istediğini anlat..."
-      ></textarea>
-    </div>
+  <button class="active"
+  onclick="showPage('home',this)">
+   Ana Sayfa
+  </button>
 
-    <button class="primary-btn" onclick="generateResult()">
-      Üretim Promptu Hazırla
-    </button>
+  <button
+  onclick="showPage('music',this)">
+   AI Müzik
+  </button>
 
-    <div id="resultArea" class="hidden">
-      <div id="resultText" class="result-box"></div>
+  <button
+  onclick="showPage('lyrics',this)">
+   Şarkı Sözleri
+  </button>
 
-      <button class="secondary-btn" onclick="copyResult()">
-        Sonucu Kopyala
-      </button>
+  <button
+  onclick="showPage('image',this)">
+   Görsel
+  </button>
 
-      <button class="secondary-btn" onclick="saveProject()">
-        Projeyi Kaydet
-      </button>
-    </div>
+  <button
+  onclick="showPage('video',this)">
+   Video
+  </button>
 
-  </section>
+  <button
+  onclick="showPage('projects',this)">
+   Projelerim
+  </button>
 
-  <!-- PROJELER -->
-  <section id="projectsPanel" class="panel hidden">
+  <button
+  onclick="showPage('account',this)">
+   Hesabım
+  </button>
 
-    <h2>📁 Projelerim</h2>
+ </div>
 
-    <div id="projectsList">
-      <p>Projeler yükleniyor...</p>
-    </div>
+ <div id="homePage" class="page">
 
-  </section>
+  <div class="section-header">
+   <h2>Üretim Araçları</h2>
+  </div>
 
-  <!-- HESAP -->
-  <section id="accountPanel" class="panel hidden">
+  <div class="grid">
 
-    <h2>👤 Hesabım</h2>
+   <div class="tool-card"
+   onclick="showPage('music')">
 
-    <p style="color:#aaa9bd;margin-bottom:12px">
-      E-posta adresin:
-    </p>
+    <div class="tool-icon">🎵</div>
 
-    <p id="accountEmail" style="margin-bottom:18px"></p>
+    <h3>AI Müzik</h3>
 
-    <p style="color:#aaa9bd;margin-bottom:8px">
-      Mevcut kredi:
-    </p>
+    <p>Şarkı fikri ve müzik üretim promptu hazırla.</p>
 
-    <h2 id="accountCredits">50</h2>
+   </div>
 
-    <p style="color:#aaa9bd;font-size:13px;line-height:1.6">
-      Kredi ve üyelik sistemi sonraki aşamada güvenli sunucu
-      işlemleriyle tamamlanacaktır.
-    </p>
+   <div class="tool-card"
+   onclick="showPage('lyrics')">
 
-  </section>
+    <div class="tool-icon">✍️</div>
+
+    <h3>Şarkı Sözleri</h3>
+
+    <p>Şarkı sözlerini düzenle ve proje olarak kaydet.</p>
+
+   </div>
+
+   <div class="tool-card"
+   onclick="showPage('image')">
+
+    <div class="tool-icon">🎨</div>
+
+    <h3>AI Görsel</h3>
+
+    <p>Görsel üretim fikirleri ve promptları hazırla.</p>
+
+   </div>
+
+   <div class="tool-card"
+   onclick="showPage('video')">
+
+    <div class="tool-icon">🎬</div>
+
+    <h3>AI Video</h3>
+
+    <p>Video ve klip üretim fikirleri hazırla.</p>
+
+   </div>
+
+   <div class="tool-card"
+   onclick="showPage('projects')">
+
+    <div class="tool-icon">📁</div>
+
+    <h3>Projelerim</h3>
+
+    <p>Kaydettiğin çalışmalarını görüntüle.</p>
+
+   </div>
+
+   <div class="tool-card"
+   onclick="showPage('account')">
+
+    <div class="tool-icon">👤</div>
+
+    <h3>Hesabım</h3>
+
+    <p>Hesap bilgilerini görüntüle.</p>
+
+   </div>
+
+  </div>
+
+ </div>
+
+ <div id="musicPage" class="page hidden"></div>
+
+ <div id="lyricsPage" class="page hidden"></div>
+
+ <div id="imagePage" class="page hidden"></div>
+
+ <div id="videoPage" class="page hidden"></div>
+
+ <div id="projectsPage" class="page hidden"></div>
+
+ <div id="accountPage" class="page hidden"></div>
 
 </main>
 
-<footer class="footer">
-  SESMOD AI STUDIO © 2026
-  <br>
-  Tüm hakları saklıdır.
-  </footer>
-  <script>
-/* =====================================
-   SESMOD AI STUDIO
-   SUPABASE BAĞLANTISI
-===================================== */
+<footer>
+ SESMOD AI STUDIO © 2026
+</footer>
 
-const SUPABASE_URL = "https://izlwpgepxyzzzsvfcuph.supabase.co";
+</div>
+<script>
 
-const SUPABASE_KEY = "sb_publishable_1tRMEPEDJgHb3rz1PF4lag_2Um3_jZl";
+// =====================================
+// SUPABASE BAĞLANTISI
+// =====================================
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+// BURAYA KENDİ SUPABASE BİLGİLERİNİ YAZ
+const SUPABASE_URL = "SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "SUPABASE_ANON_KEY";
+
+let db = null;
+let currentUser = null;
+let currentCredits = 50;
+let currentPage = "home";
+let authMode = "login";
+
+// =====================================
+// UYGULAMA BAŞLATMA
+// =====================================
+
+function initializeApp(){
+
+ if(
+  SUPABASE_URL !== "SUPABASE_PROJECT_URL" &&
+  SUPABASE_ANON_KEY !== "SUPABASE_ANON_KEY"
+ ){
+
+  db = window.supabase.createClient(
+   SUPABASE_URL,
+   SUPABASE_ANON_KEY
+  );
+
+  checkSession();
+
+ }else{
+
+  showMessage(
+   "Supabase bağlantı bilgileri henüz girilmedi.",
+   "error"
+  );
+
+ }
+
+}
+
+// =====================================
+// GİRİŞ / KAYIT SEKME
+// =====================================
+
+function showAuth(mode){
+
+ authMode = mode;
+
+ document.getElementById("loginTab")
+ .classList.toggle("active",mode==="login");
+
+ document.getElementById("registerTab")
+ .classList.toggle("active",mode==="register");
+
+ document.getElementById("authButton")
+ .textContent = mode==="login"
+ ? "Giriş Yap"
+ : "Hesap Oluştur";
+
+ hideMessage();
+
+}
+
+// =====================================
+// MESAJ SİSTEMİ
+// =====================================
+
+function showMessage(message,type){
+
+ const box = document.getElementById("message");
+
+ box.textContent = message;
+
+ box.className = "show";
+
+ if(type==="error"){
+  box.style.background="#48242d";
+  box.style.color="#ffb4c0";
+ }else{
+  box.style.background="#302440";
+  box.style.color="#e2caff";
+ }
+
+}
+
+function hideMessage(){
+
+ const box = document.getElementById("message");
+
+ box.className="";
+
+ box.textContent="";
+
+}
+
+// =====================================
+// GİRİŞ VE HESAP OLUŞTURMA
+// =====================================
+
+async function handleAuth(){
+
+ if(!db){
+
+  showMessage(
+   "Supabase bağlantısı yapılandırılmamış.",
+   "error"
+  );
+
+  return;
+
+ }
+
+ const email =
+ document.getElementById("email").value.trim();
+
+ const password =
+ document.getElementById("password").value;
+
+ if(!email || !password){
+
+  showMessage(
+   "E-posta ve şifre alanlarını doldur.",
+   "error"
+  );
+
+  return;
+
+ }
+
+ if(password.length < 6){
+
+  showMessage(
+   "Şifre en az 6 karakter olmalı.",
+   "error"
+  );
+
+  return;
+
+ }
+
+ const button =
+ document.getElementById("authButton");
+
+ button.disabled=true;
+
+ button.textContent="Bekleyin...";
+
+ try{
+
+  let result;
+
+  if(authMode==="register"){
+
+   result = await db.auth.signUp({
+    email:email,
+    password:password
+   });
+
+  }else{
+
+   result = await db.auth.signInWithPassword({
+    email:email,
+    password:password
+   });
+
+  }
+
+  if(result.error){
+
+   throw result.error;
+
+  }
+
+  if(result.data.user){
+
+   currentUser=result.data.user;
+
+   if(result.data.session){
+
+    await openApplication(currentUser);
+
+   }else{
+
+    showMessage(
+     "Hesap oluşturuldu. E-postanı kontrol ederek hesabını doğrula.",
+     "success"
+    );
+
+   }
+
+  }
+
+ }catch(error){
+
+  showMessage(
+   error.message || "Bir hata oluştu.",
+   "error"
+  );
+
+ }finally{
+
+  button.disabled=false;
+
+  button.textContent =
+  authMode==="login"
+  ? "Giriş Yap"
+  : "Hesap Oluştur";
+
+ }
+
+}
+
+// =====================================
+// OTURUM KONTROLÜ
+// =====================================
+
+async function checkSession(){
+
+ if(!db)return;
+
+ try{
+
+  const {data,error} =
+  await db.auth.getSession();
+
+  if(error)throw error;
+
+  if(data.session){
+
+   currentUser=data.session.user;
+
+   await openApplication(currentUser);
+
+  }
+
+ }catch(error){
+
+  console.error("Oturum kontrolü:",error);
+
+ }
+
+}
+
+// =====================================
+// UYGULAMAYI AÇ
+// =====================================
+
+async function openApplication(user){
+
+ currentUser=user;
+
+ document.getElementById("authScreen")
+ .classList.add("hidden");
+
+ document.getElementById("appScreen")
+ .classList.remove("hidden");
+
+ document.getElementById("userEmail")
+ .textContent=user.email || "";
+
+ await loadUserCredits();
+
+ renderMusicPage();
+
+ renderLyricsPage();
+
+ renderImagePage();
+
+ renderVideoPage();
+
+ renderProjectsPage();
+
+ renderAccountPage();
+
+ showPage("home");
+
+}
+
+// =====================================
+// ÇIKIŞ YAP
+// =====================================
+
+async function logout(){
+
+ if(db){
+
+  const {error}=await db.auth.signOut();
+
+  if(error){
+
+   alert(error.message);
+
+   return;
+
+  }
+
+ }
+
+ currentUser=null;
+
+ document.getElementById("appScreen")
+ .classList.add("hidden");
+
+ document.getElementById("authScreen")
+ .classList.remove("hidden");
+
+ document.getElementById("email").value="";
+
+ document.getElementById("password").value="";
+
+ showAuth("login");
+
+}
+
+// =====================================
+// SAYFA GEÇİŞLERİ
+// =====================================
+
+function showPage(page,button){
+
+ currentPage=page;
+
+ document.querySelectorAll(".page")
+ .forEach(element=>{
+  element.classList.add("hidden");
+ });
+
+ const target =
+ document.getElementById(page+"Page");
+
+ if(target){
+
+  target.classList.remove("hidden");
+
+ }
+
+ if(button){
+
+  document.querySelectorAll(".nav button")
+  .forEach(element=>{
+   element.classList.remove("active");
+  });
+
+  button.classList.add("active");
+
+ }else{
+
+  document.querySelectorAll(".nav button")
+  .forEach(element=>{
+   element.classList.remove("active");
+  });
+
+  const buttons =
+  document.querySelectorAll(".nav button");
+
+  const pages=[
+   "home",
+   "music",
+   "lyrics",
+   "image",
+   "video",
+   "projects",
+   "account"
+  ];
+
+  const index=pages.indexOf(page);
+
+  if(index>=0 && buttons[index]){
+   buttons[index].classList.add("active");
+  }
+
+ }
+
+ window.scrollTo({
+  top:0,
+  behavior:"smooth"
+ });
+
+}
+
+// =====================================
+// KREDİ SİSTEMİ
+// =====================================
+
+async function loadUserCredits(){
+
+ if(!currentUser)return;
+
+ try{
+
+  const {data,error}=await db
+  .from("profiles")
+  .select("credits")
+  .eq("id",currentUser.id)
+  .maybeSingle();
+
+  if(error){
+
+   console.log("Kredi tablosu:",error.message);
+
+   return;
+
+  }
+
+  if(data && data.credits!==null){
+
+   currentCredits=Number(data.credits);
+
+  }else{
+
+   currentCredits=50;
+
+  }
+
+  updateCreditDisplay();
+
+ }catch(error){
+
+  console.error(error);
+
+ }
+
+}
+
+function updateCreditDisplay(){
+
+ document.getElementById("creditCount")
+ .textContent=currentCredits;
+
+}
+
+// =====================================
+// KREDİ DÜŞÜRME
+// =====================================
+
+async function spendCredits(amount){
+
+ amount=Number(amount);
+
+ if(!Number.isFinite(amount) || amount<=0){
+  return false;
+ }
+
+ if(currentCredits<amount){
+
+  alert("Yeterli kredin bulunmuyor.");
+
+  return false;
+
+ }
+
+ if(!currentUser || !db){
+
+  alert("Önce giriş yapmalısın.");
+
+  return false;
+
+ }
+
+ const newCredits=currentCredits-amount;
+
+ try{
+
+  const {data,error}=await db
+  .from("profiles")
+  .update({
+   credits:newCredits
+  })
+  .eq("id",currentUser.id)
+  .select("credits")
+  .maybeSingle();
+
+  if(error)throw error;
+
+  if(!data){
+
+   alert("Kredi kaydı güncellenemedi.");
+
+   return false;
+
+  }
+
+  currentCredits=Number(data.credits);
+
+  updateCreditDisplay();
+
+  return true;
+
+ }catch(error){
+
+  console.error(error);
+
+  alert("Kredi güncellenemedi: "+error.message);
+
+  return false;
+
+ }
+
+}
+
+// =====================================
+// KREDİ EKLEME
+// =====================================
+
+async function addCredits(amount){
+
+ amount=Number(amount);
+
+ if(!Number.isFinite(amount) || amount<=0){
+  return false;
+ }
+
+ if(!currentUser || !db)return false;
+
+ const newCredits=currentCredits+amount;
+
+ try{
+
+  const {data,error}=await db
+  .from("profiles")
+  .update({
+   credits:newCredits
+  })
+  .eq("id",currentUser.id)
+  .select("credits")
+  .maybeSingle();
+
+  if(error)throw error;
+
+  if(!data)return false;
+
+  currentCredits=Number(data.credits);
+
+  updateCreditDisplay();
+
+  return true;
+
+ }catch(error){
+
+  console.error(error);
+
+  return false;
+
+ }
+
+}
+
+// =====================================
+// UYGULAMA BAŞLAT
+// =====================================
+
+document.addEventListener(
+ "DOMContentLoaded",
+ initializeApp
 );
 
-let currentUser = null;
-let currentMode = "login";
-let currentTool = "";
-let currentResult = null;
-let projects = [];
+  </script>
+  <script>
 
-/* =====================================
-   GİRİŞ VE KAYIT
-===================================== */
+// =====================================
+// AI MÜZİK SAYFASI
+// =====================================
 
-function setAuthMode(mode) {
-  currentMode = mode;
+function renderMusicPage(){
 
-  document.getElementById("loginTab").classList.toggle(
-    "active",
-    mode === "login"
-  );
+ const page=document.getElementById("musicPage");
 
-  document.getElementById("registerTab").classList.toggle(
-    "active",
-    mode === "register"
-  );
+ page.innerHTML=`
 
-  document.getElementById("authButton").textContent =
-    mode === "login" ? "Giriş Yap" : "Hesap Oluştur";
+ <div class="panel">
 
-  document.getElementById("authMessage").textContent = "";
+  <h2>🎵 AI Müzik Stüdyosu</h2>
+
+  <p>Şarkı fikrini oluştur ve müzik üretim promptunu hazırla.</p>
+
+  <label>Şarkı adı</label>
+
+  <input id="musicTitle" placeholder="Şarkının adı">
+
+  <label>Müzik türü</label>
+
+  <select id="musicGenre">
+   <option>Modern Arabesk</option>
+   <option>Arabesk Rock</option>
+   <option>Türkü</option>
+   <option>Pop</option>
+   <option>Rock</option>
+   <option>Rap</option>
+   <option>Fantazi</option>
+   <option>Türk Halk Müziği</option>
+   <option>Anadolu Rock</option>
+   <option>Slow</option>
+  </select>
+
+  <label>Vokal tercihi</label>
+
+  <select id="musicVoice">
+   <option>Erkek vokal</option>
+   <option>Kadın vokal</option>
+   <option>Düet</option>
+   <option>Enstrümantal</option>
+  </select>
+
+  <label>Şarkının duygusu</label>
+
+  <textarea id="musicMood" placeholder="Örneğin: Ayrılık, özlem, aşk, hüzün..."></textarea>
+
+  <label>Enstrümanlar</label>
+
+  <input id="musicInstruments" placeholder="Klarnet, gitar, bağlama, piyano...">
+
+  <button class="btn" onclick="generateMusicPrompt()">
+   Prompt Oluştur
+  </button>
+
+  <div id="musicResult" class="section"></div>
+
+ </div>
+
+ `;
+
 }
 
-async function handleAuth() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const message = document.getElementById("authMessage");
-  const button = document.getElementById("authButton");
+// =====================================
+// MÜZİK PROMPT OLUŞTURMA
+// =====================================
 
-  message.style.color = "#fca5a5";
+async function generateMusicPrompt(){
 
-  if (!email || !password) {
-    message.textContent = "E-posta ve şifre alanlarını doldur.";
-    return;
-  }
+ const title=document.getElementById("musicTitle").value.trim();
 
-  if (password.length < 6) {
-    message.textContent = "Şifre en az 6 karakter olmalıdır.";
-    return;
-  }
+ const genre=document.getElementById("musicGenre").value;
 
-  button.disabled = true;
-  button.textContent = "İşlem yapılıyor...";
+ const voice=document.getElementById("musicVoice").value;
 
-  try {
-    let result;
+ const mood=document.getElementById("musicMood").value.trim();
 
-    if (currentMode === "register") {
-      result = await db.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          emailRedirectTo: window.location.origin
-        }
-      });
-    } else {
-      result = await db.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-    }
+ const instruments=document.getElementById("musicInstruments").value.trim();
 
-    if (result.error) {
-      throw result.error;
-    }
+ if(!title || !mood){
 
-    if (currentMode === "register" && !result.data.session) {
-      message.style.color = "#86efac";
-      message.textContent =
-        "Kayıt oluşturuldu. E-postana gelen doğrulama bağlantısına tıkla.";
-      return;
-    }
+  alert("Şarkı adı ve şarkının duygusunu yaz.");
 
-    message.style.color = "#86efac";
-    message.textContent = "Giriş başarılı.";
+  return;
 
-    await showApp(result.data.user);
+ }
 
-  } catch (error) {
-    message.textContent = error.message || "İşlem başarısız.";
-  } finally {
-    button.disabled = false;
-    button.textContent =
-      currentMode === "login" ? "Giriş Yap" : "Hesap Oluştur";
-  }
+ const prompt=`
+
+SONG TITLE: ${title}
+
+GENRE: ${genre}
+
+VOCAL: ${voice}
+
+EMOTION: ${mood}
+
+INSTRUMENTS: ${instruments || "Genre appropriate instruments"}
+
+PRODUCTION STYLE:
+
+Professional studio recording.
+Emotional and memorable melody.
+Strong vocal performance.
+High quality mixing and mastering.
+No long instrumental introduction.
+Start with vocals as early as possible.
+Natural song structure.
+Clear Turkish pronunciation.
+
+`;
+
+ document.getElementById("musicResult").innerHTML=`
+
+ <h3>Hazırlanan Müzik Promptu</h3>
+
+ <textarea id="musicPromptOutput">${escapeHTML(prompt)}</textarea>
+
+ <div class="action-row">
+
+  <button class="btn" onclick="copyText('musicPromptOutput')">
+   Kopyala
+  </button>
+
+  <button class="btn btn-secondary" onclick="saveProject('Müzik Promptu','musicPromptOutput')">
+   Projeye Kaydet
+  </button>
+
+ </div>
+
+ `;
+
 }
 
-/* =====================================
-   GOOGLE İLE GİRİŞ
-===================================== */
+// =====================================
+// ŞARKI SÖZLERİ SAYFASI
+// =====================================
 
-async function googleLogin() {
-  const message = document.getElementById("authMessage");
+function renderLyricsPage(){
 
-  message.textContent = "Google girişine yönlendiriliyorsun...";
+ const page=document.getElementById("lyricsPage");
 
-  const { error } = await db.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: window.location.origin
-    }
-  });
+ page.innerHTML=`
 
-  if (error) {
-    message.textContent = error.message;
-  }
+ <div class="panel">
+
+  <h2>✍️ Şarkı Sözleri Stüdyosu</h2>
+
+  <p>Şarkı sözlerini yaz, düzenle ve projelerine kaydet.</p>
+
+  <label>Şarkı adı</label>
+
+  <input id="lyricsTitle" placeholder="Şarkının adı">
+
+  <label>Şarkı türü</label>
+
+  <select id="lyricsGenre">
+   <option>Arabesk</option>
+   <option>Arabesk Rock</option>
+   <option>Türkü</option>
+   <option>Pop</option>
+   <option>Rock</option>
+   <option>Rap</option>
+   <option>Fantazi</option>
+  </select>
+
+  <label>Şarkı sözlerin</label>
+
+  <textarea id="lyricsText" style="min-height:260px" placeholder="Şarkı sözlerini buraya yaz..."></textarea>
+
+  <div class="action-row">
+
+   <button class="btn" onclick="saveLyricsProject()">
+    Projeye Kaydet
+   </button>
+
+   <button class="btn btn-secondary" onclick="copyText('lyricsText')">
+    Kopyala
+   </button>
+
+   <button class="btn btn-secondary" onclick="clearLyrics()">
+    Temizle
+   </button>
+
+  </div>
+
+  <p class="status">Şarkı sözlerini kendi çalışmaların için saklayabilirsin.</p>
+
+ </div>
+
+ `;
+
 }
 
-/* =====================================
-   OTURUM KONTROLÜ
-===================================== */
+// =====================================
+// ŞARKI SÖZLERİNİ KAYDET
+// =====================================
 
-async function checkSession() {
-  const { data, error } = await db.auth.getSession();
+function saveLyricsProject(){
 
-  if (error) {
-    console.error("Oturum kontrol hatası:", error.message);
-    return;
-  }
+ const title=document.getElementById("lyricsTitle").value.trim();
 
-  if (data.session && data.session.user) {
-    await showApp(data.session.user);
-  }
+ const lyrics=document.getElementById("lyricsText").value.trim();
+
+ const genre=document.getElementById("lyricsGenre").value;
+
+ if(!title || !lyrics){
+
+  alert("Şarkı adı ve sözleri boş bırakılamaz.");
+
+  return;
+
+ }
+
+ saveProjectData(
+  title,
+  "lyrics",
+  "Tür: "+genre+"\n\n"+lyrics
+ );
+
 }
 
-/* =====================================
-   ANA EKRANI AÇ
-===================================== */
+// =====================================
+// ŞARKI SÖZLERİNİ TEMİZLE
+// =====================================
 
-async function showApp(user) {
-  if (!user) return;
+function clearLyrics(){
 
-  currentUser = user;
+ if(!confirm("Şarkı sözleri temizlensin mi?"))return;
 
-  document.getElementById("authScreen").classList.add("hidden");
-  document.getElementById("appScreen").classList.remove("hidden");
-  document.getElementById("appHeader").classList.remove("hidden");
+ document.getElementById("lyricsTitle").value="";
 
-  document.getElementById("userEmail").textContent = user.email || "";
-  document.getElementById("accountEmail").textContent = user.email || "";
+ document.getElementById("lyricsText").value="";
 
-  await loadCredits();
+}
+
+// =====================================
+// GÖRSEL ÜRETİM SAYFASI
+// =====================================
+
+function renderImagePage(){
+
+ const page=document.getElementById("imagePage");
+
+ page.innerHTML=`
+
+ <div class="panel">
+
+  <h2>🎨 AI Görsel Stüdyosu</h2>
+
+  <p>Kapak, poster ve sosyal medya görselleri için prompt hazırla.</p>
+
+  <label>Görsel başlığı</label>
+
+  <input id="imageTitle" placeholder="Örneğin: Yüreğimde Kaldın">
+
+  <label>Görsel türü</label>
+
+  <select id="imageType">
+   <option>Şarkı Kapak Görseli</option>
+   <option>YouTube Thumbnail</option>
+   <option>Instagram Posteri</option>
+   <option>Sinema Posteri</option>
+   <option>Albüm Kapağı</option>
+   <option>Sanatsal Görsel</option>
+  </select>
+
+  <label>Görsel açıklaması</label>
+
+  <textarea id="imageDescription" placeholder="Nasıl bir görsel istiyorsun?"></textarea>
+
+  <label>Görsel tarzı</label>
+
+  <select id="imageStyle">
+   <option>Gerçekçi sinematik</option>
+   <option>Modern ve lüks</option>
+   <option>Minimalist</option>
+   <option>Dramatik ve karanlık</option>
+   <option>Romantik</option>
+   <option>Vintage</option>
+   <option>Sanatsal</option>
+  </select>
+
+  <button class="btn" onclick="generateImagePrompt()">
+   Görsel Promptu Oluştur
+  </button>
+
+  <div id="imageResult" class="section"></div>
+
+ </div>
+
+ `;
+
+}
+
+// =====================================
+// GÖRSEL PROMPT OLUŞTUR
+// =====================================
+
+function generateImagePrompt(){
+
+ const title=document.getElementById("imageTitle").value.trim();
+
+ const type=document.getElementById("imageType").value;
+
+ const description=document.getElementById("imageDescription").value.trim();
+
+ const style=document.getElementById("imageStyle").value;
+
+ if(!title || !description){
+
+  alert("Başlık ve görsel açıklaması gerekli.");
+
+  return;
+
+ }
+
+ const prompt=`
+
+Create a professional ${type}.
+
+TITLE: ${title}
+
+DESCRIPTION: ${description}
+
+VISUAL STYLE: ${style}
+
+High quality detailed composition.
+Professional lighting.
+Cinematic atmosphere.
+Carefully balanced colors.
+Sharp details.
+Professional commercial design.
+No watermark.
+No unnecessary text.
+High resolution.
+
+`;
+
+ document.getElementById("imageResult").innerHTML=`
+
+ <h3>Hazırlanan Görsel Promptu</h3>
+
+ <textarea id="imagePromptOutput">${escapeHTML(prompt)}</textarea>
+
+ <div class="action-row">
+
+  <button class="btn" onclick="copyText('imagePromptOutput')">
+   Kopyala
+  </button>
+
+  <button class="btn btn-secondary" onclick="saveProject('Görsel Promptu','imagePromptOutput')">
+   Projeye Kaydet
+  </button>
+
+ </div>
+
+ `;
+
+}
+
+// =====================================
+// GENEL KOPYALAMA FONKSİYONU
+// =====================================
+
+async function copyText(id){
+
+ const element=document.getElementById(id);
+
+ if(!element)return;
+
+ try{
+
+  await navigator.clipboard.writeText(element.value);
+
+  alert("Metin kopyalandı.");
+
+ }catch(error){
+
+  element.select();
+
+  document.execCommand("copy");
+
+  alert("Metin kopyalandı.");
+
+ }
+
+}
+
+// =====================================
+// HTML GÜVENLİ METİN
+// =====================================
+
+function escapeHTML(value){
+
+ return String(value)
+ .replace(/&/g,"&amp;")
+ .replace(/</g,"&lt;")
+ .replace(/>/g,"&gt;")
+ .replace(/"/g,"&quot;")
+ .replace(/'/g,"&#039;");
+
+}
+
+  </script>
+  <script>
+
+// =====================================
+// AI VIDEO SAYFASI
+// =====================================
+
+function renderVideoPage(){
+
+ const page=document.getElementById("videoPage");
+
+ page.innerHTML=`
+
+ <div class="panel">
+
+  <h2>🎬 AI Video Stüdyosu</h2>
+
+  <p>Şarkılarına klip, kısa film ve video sahnesi promptları hazırla.</p>
+
+  <label>Video / Proje adı</label>
+
+  <input id="videoTitle" placeholder="Video başlığı">
+
+  <label>Video türü</label>
+
+  <select id="videoType">
+   <option>Şarkı Klibi</option>
+   <option>Sinema Filmi</option>
+   <option>YouTube Shorts</option>
+   <option>TikTok Videosu</option>
+   <option>Tanıtım Videosu</option>
+   <option>Hikaye Videosu</option>
+  </select>
+
+  <label>Video açıklaması</label>
+
+  <textarea id="videoDescription" placeholder="Sahneyi ve videoda neler olacağını anlat..."></textarea>
+
+  <label>Görüntü tarzı</label>
+
+  <select id="videoStyle">
+   <option>Sinematik gerçekçilik</option>
+   <option>Dramatik</option>
+   <option>Romantik</option>
+   <option>Aksiyon</option>
+   <option>Belgesel</option>
+   <option>Sanatsal</option>
+  </select>
+
+  <label>Video oranı</label>
+
+  <select id="videoRatio">
+   <option>16:9 Yatay</option>
+   <option>9:16 Dikey</option>
+   <option>1:1 Kare</option>
+  </select>
+
+  <button class="btn" onclick="generateVideoPrompt()">
+   Video Promptu Oluştur
+  </button>
+
+  <div id="videoResult" class="section"></div>
+
+ </div>
+
+ `;
+
+}
+
+// =====================================
+// VIDEO PROMPT OLUŞTUR
+// =====================================
+
+function generateVideoPrompt(){
+
+ const title=document.getElementById("videoTitle").value.trim();
+
+ const type=document.getElementById("videoType").value;
+
+ const description=document.getElementById("videoDescription").value.trim();
+
+ const style=document.getElementById("videoStyle").value;
+
+ const ratio=document.getElementById("videoRatio").value;
+
+ if(!title || !description){
+
+  alert("Video başlığı ve açıklaması gerekli.");
+
+  return;
+
+ }
+
+ const prompt=`
+
+PROJECT TITLE: ${title}
+
+VIDEO TYPE: ${type}
+
+SCENE DESCRIPTION: ${description}
+
+VISUAL STYLE: ${style}
+
+ASPECT RATIO: ${ratio}
+
+PRODUCTION:
+
+Professional cinematic quality.
+Smooth camera movement.
+Natural realistic motion.
+Detailed environments.
+Consistent characters.
+Professional lighting.
+High quality visual composition.
+No unnecessary text.
+No watermark.
+
+`;
+
+ document.getElementById("videoResult").innerHTML=`
+
+ <h3>Hazırlanan Video Promptu</h3>
+
+ <textarea id="videoPromptOutput">${escapeHTML(prompt)}</textarea>
+
+ <div class="action-row">
+
+  <button class="btn" onclick="copyText('videoPromptOutput')">
+   Kopyala
+  </button>
+
+  <button class="btn btn-secondary" onclick="saveProject('Video Promptu','videoPromptOutput')">
+   Projeye Kaydet
+  </button>
+
+ </div>
+
+ `;
+
+}
+
+// =====================================
+// PROJE KAYDETME
+// =====================================
+
+function saveProject(title,id){
+
+ const element=document.getElementById(id);
+
+ if(!element)return;
+
+ const content=element.value.trim();
+
+ if(!content){
+
+  alert("Kaydedilecek içerik bulunamadı.");
+
+  return;
+
+ }
+
+ saveProjectData(
+  title,
+  "general",
+  content
+ );
+
+}
+
+// =====================================
+// PROJE VERİSİNİ KAYDET
+// =====================================
+
+async function saveProjectData(title,type,content){
+
+ if(!currentUser || !db){
+
+  alert("Önce giriş yapmalısın.");
+
+  return;
+
+ }
+
+ try{
+
+  const {data,error}=await db
+  .from("projects")
+  .insert({
+
+   user_id:currentUser.id,
+
+   title:title,
+
+   type:type,
+
+   content:content
+
+  })
+  .select()
+  .single();
+
+  if(error)throw error;
+
+  alert("Projen başarıyla kaydedildi.");
+
   await loadProjects();
+
+ }catch(error){
+
+  console.error(error);
+
+  alert("Proje kaydedilemedi: "+error.message);
+
+ }
+
 }
 
-/* =====================================
-   ÇIKIŞ
-===================================== */
+// =====================================
+// PROJELERİM SAYFASI
+// =====================================
 
-async function logout() {
-  const { error } = await db.auth.signOut();
+function renderProjectsPage(){
 
-  if (error) {
-    alert("Çıkış yapılamadı: " + error.message);
-    return;
+ const page=document.getElementById("projectsPage");
+
+ page.innerHTML=`
+
+ <div class="panel">
+
+  <div class="section-header">
+
+   <h2>📁 Projelerim</h2>
+
+   <button class="btn btn-secondary"
+   onclick="loadProjects()">
+    Yenile
+   </button>
+
+  </div>
+
+  <p>Kaydettiğin tüm çalışmalar burada görüntülenir.</p>
+
+  <div id="projectsList" class="section">
+
+   <p>Projeler yükleniyor...</p>
+
+  </div>
+
+ </div>
+
+ `;
+
+ loadProjects();
+
+}
+
+// =====================================
+// PROJELERİ YÜKLE
+// =====================================
+
+async function loadProjects(){
+
+ const list=document.getElementById("projectsList");
+
+ if(!list || !currentUser || !db)return;
+
+ list.innerHTML="<p>Projeler yükleniyor...</p>";
+
+ try{
+
+  const {data,error}=await db
+  .from("projects")
+  .select("*")
+  .eq("user_id",currentUser.id)
+  .order("created_at",{ascending:false});
+
+  if(error)throw error;
+
+  if(!data || data.length===0){
+
+   list.innerHTML=`
+
+    <div class="card">
+
+     <p>Henüz kaydedilmiş projen yok.</p>
+
+    </div>
+
+   `;
+
+   return;
+
   }
 
-  currentUser = null;
-  projects = [];
+  list.innerHTML="";
 
-  document.getElementById("appScreen").classList.add("hidden");
-  document.getElementById("appHeader").classList.add("hidden");
-  document.getElementById("authScreen").classList.remove("hidden");
+  data.forEach(project=>{
 
-  document.getElementById("email").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("authMessage").textContent = "";
-}
+   const item=document.createElement("div");
 
-/* =====================================
-   KREDİ BİLGİSİ
-===================================== */
+   item.className="project-item";
 
-async function loadCredits() {
-  if (!currentUser) return;
+   const info=document.createElement("div");
 
-  /*
-    Bu sürümde kredi göstergesi başlangıç
-    arayüz değeridir. Gerçek kredi düşümü
-    henüz güvenli sunucu sistemine bağlı değildir.
-  */
+   const title=document.createElement("strong");
 
-  const credits = 50;
+   title.textContent=project.title;
 
-  document.getElementById("creditCount").textContent = credits;
-  document.getElementById("accountCredits").textContent = credits;
-}
+   const small=document.createElement("small");
 
-/* =====================================
-   PANEL YÖNETİMİ
-===================================== */
+   small.textContent=" · "+project.type;
 
-function hidePanels() {
-  document.getElementById("toolPanel").classList.add("hidden");
-  document.getElementById("projectsPanel").classList.add("hidden");
-  document.getElementById("accountPanel").classList.add("hidden");
-}
+   info.appendChild(title);
 
-function openTool(type) {
-  currentTool = type;
+   info.appendChild(document.createElement("br"));
 
-  hidePanels();
+   info.appendChild(small);
 
-  const titles = {
-    music: "🎵 AI Müzik",
-    lyrics: "✍️ Şarkı Sözleri",
-    image: "🎨 AI Görsel",
-    video: "🎬 AI Video"
-  };
+   const actions=document.createElement("div");
 
-  document.getElementById("toolTitle").textContent =
-    titles[type] || "AI Üretim";
+   actions.className="action-row";
 
-  document.getElementById("projectTitle").value = "";
-  document.getElementById("projectDescription").value = "";
-  document.getElementById("resultArea").classList.add("hidden");
+   const openButton=document.createElement("button");
 
-  document.getElementById("toolPanel").classList.remove("hidden");
+   openButton.className="btn btn-secondary";
 
-  document.getElementById("toolPanel").scrollIntoView({
-    behavior: "smooth"
+   openButton.textContent="Aç";
+
+   openButton.onclick=()=>openProject(project.id);
+
+   const deleteButton=document.createElement("button");
+
+   deleteButton.className="btn btn-danger";
+
+   deleteButton.textContent="Sil";
+
+   deleteButton.onclick=()=>deleteProject(project.id);
+
+   actions.appendChild(openButton);
+
+   actions.appendChild(deleteButton);
+
+   item.appendChild(info);
+
+   item.appendChild(actions);
+
+   list.appendChild(item);
+
   });
+
+ }catch(error){
+
+  console.error(error);
+
+  list.innerHTML="<p>Projeler yüklenemedi: "+escapeHTML(error.message)+"</p>";
+
+ }
+
 }
 
-function openProjects() {
-  hidePanels();
+// =====================================
+// PROJE AÇ
+// =====================================
 
-  document.getElementById("projectsPanel").classList.remove("hidden");
+async function openProject(id){
 
-  loadProjects();
+ try{
 
-  document.getElementById("projectsPanel").scrollIntoView({
-    behavior: "smooth"
-  });
-}
+  const {data,error}=await db
+  .from("projects")
+  .select("*")
+  .eq("id",id)
+  .eq("user_id",currentUser.id)
+  .single();
 
-function openAccount() {
-  hidePanels();
+  if(error)throw error;
 
-  document.getElementById("accountPanel").classList.remove("hidden");
+  const overlay=document.createElement("div");
 
-  document.getElementById("accountPanel").scrollIntoView({
-    behavior: "smooth"
-  });
-}
-    /* =====================================
-   ÜRETİM PROMPTU OLUŞTUR
-===================================== */
+  overlay.style.cssText=`
+   position:fixed;
+   inset:0;
+   z-index:100;
+   background:rgba(0,0,0,.85);
+   display:flex;
+   align-items:center;
+   justify-content:center;
+   padding:15px;
+  `;
 
-function generateResult() {
-  const title = document.getElementById("projectTitle").value.trim();
-  const style = document.getElementById("projectStyle").value;
-  const description = document.getElementById("projectDescription").value.trim();
+  const box=document.createElement("div");
 
-  if (!title) {
-    alert("Lütfen proje başlığını yaz.");
-    return;
-  }
+  box.className="panel";
 
-  if (!description) {
-    alert("Lütfen proje açıklamasını yaz.");
-    return;
-  }
+  box.style.cssText=`
+   width:100%;
+   max-width:650px;
+   max-height:85vh;
+   overflow:auto;
+  `;
 
-  const prompts = {
-    music:
-      "Profesyonel müzik prodüksiyonu oluştur.\n" +
-      "Proje: " + title + "\n" +
-      "Müzik tarzı: " + style + "\n" +
-      "Açıklama: " + description + "\n" +
-      "Vokal: Duygulu, güçlü ve doğal.\n" +
-      "Düzenleme: Profesyonel enstrümanlar, dengeli miks ve mastering.\n" +
-      "Not: Uzun enstrümantal giriş kullanma, vokal hızlı başlasın.",
+  const heading=document.createElement("h2");
 
-    lyrics:
-      "Şarkı sözü yazımı için yaratıcı çalışma.\n" +
-      "Başlık: " + title + "\n" +
-      "Tarz: " + style + "\n" +
-      "Tema: " + description + "\n" +
-      "Yapı: Kıta 1, Ön Nakarat, Güçlü Nakarat, Kıta 2, Köprü ve Final Nakarat.\n" +
-      "Sözler özgün, akıcı, anlamlı ve kolay hatırlanabilir olsun.",
+  heading.textContent=data.title;
 
-    image:
-      "Profesyonel yapay zekâ görsel üretim promptu.\n" +
-      "Proje: " + title + "\n" +
-      "Stil: " + style + "\n" +
-      "Açıklama: " + description + "\n" +
-      "Kalite: Yüksek detay, sinematik ışık, dengeli kompozisyon, gerçekçi dokular.\n" +
-      "Görselde gereksiz yazı ve logo bulunmasın.",
+  const content=document.createElement("textarea");
 
-    video:
-      "Profesyonel yapay zekâ video ve klip promptu.\n" +
-      "Proje: " + title + "\n" +
-      "Stil: " + style + "\n" +
-      "Sahne açıklaması: " + description + "\n" +
-      "Görüntü: Sinematik kamera hareketleri, doğal ışık, tutarlı karakterler.\n" +
-      "Kurgu: Akıcı geçişler, profesyonel renk düzenleme ve yüksek görüntü kalitesi."
+  content.style.minHeight="300px";
+
+  content.value=data.content;
+
+  const close=document.createElement("button");
+
+  close.className="btn btn-secondary";
+
+  close.textContent="Kapat";
+
+  close.onclick=()=>overlay.remove();
+
+  box.appendChild(heading);
+
+  box.appendChild(content);
+
+  box.appendChild(close);
+
+  overlay.appendChild(box);
+
+  overlay.onclick=(event)=>{
+
+   if(event.target===overlay)overlay.remove();
+
   };
 
-  const result = {
-    title: title,
-    style: style,
-    description: description,
-    prompt: prompts[currentTool] || prompts.music,
-    created_at: new Date().toISOString()
-  };
+  document.body.appendChild(overlay);
 
-  showResult(title, result, currentTool);
+ }catch(error){
+
+  alert("Proje açılamadı: "+error.message);
+
+ }
+
 }
 
-function showResult(id, result, type) {
-  currentResult = {
-    title: result.title,
-    type: type,
-    data: result
-  };
+// =====================================
+// PROJE SİL
+// =====================================
 
-  document.getElementById("resultText").textContent = result.prompt;
-  document.getElementById("resultArea").classList.remove("hidden");
+async function deleteProject(id){
 
-  document.getElementById("resultArea").scrollIntoView({
-    behavior: "smooth"
-  });
+ if(!confirm("Bu projeyi silmek istediğine emin misin?"))return;
+
+ try{
+
+  const {error}=await db
+  .from("projects")
+  .delete()
+  .eq("id",id)
+  .eq("user_id",currentUser.id);
+
+  if(error)throw error;
+
+  alert("Proje silindi.");
+
+  await loadProjects();
+
+ }catch(error){
+
+  alert("Proje silinemedi: "+error.message);
+
+ }
+
 }
 
-/* =====================================
-   SONUCU KOPYALA
-===================================== */
+// =====================================
+// HESAP SAYFASI
+// =====================================
 
-async function copyResult() {
-  if (!currentResult) return;
+function renderAccountPage(){
 
-  try {
-    await navigator.clipboard.writeText(currentResult.data.prompt);
-    alert("Prompt başarıyla kopyalandı.");
-  } catch (error) {
-    const textArea = document.createElement("textarea");
-    textArea.value = currentResult.data.prompt;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand("copy");
-    textArea.remove();
-    alert("Prompt kopyalandı.");
-  }
+ const page=document.getElementById("accountPage");
+
+ page.innerHTML=`
+
+ <div class="panel">
+
+  <h2>👤 Hesabım</h2>
+
+  <div class="card">
+
+   <p>Hesap e-posta adresi</p>
+
+   <h3 id="accountEmail"></h3>
+
+   <p style="margin-top:15px">Mevcut kredin</p>
+
+   <h2 id="accountCredits">50</h2>
+
+  </div>
+
+  <div class="section">
+
+   <h3>Hesap işlemleri</h3>
+
+   <button class="btn btn-secondary"
+   onclick="resetPassword()">
+    Şifremi Sıfırla
+   </button>
+
+   <button class="btn btn-danger"
+   onclick="logout()">
+    Çıkış Yap
+   </button>
+
+  </div>
+
+ </div>
+
+ `;
+
+ if(currentUser){
+
+  document.getElementById("accountEmail")
+  .textContent=currentUser.email || "";
+
+  document.getElementById("accountCredits")
+  .textContent=currentCredits;
+
+ }
+
 }
 
-/* =====================================
-   PROJEYİ KAYDET
-===================================== */
+// =====================================
+// ŞİFRE SIFIRLAMA
+// =====================================
 
-async function saveProject() {
-  if (!currentUser || !currentResult) {
-    alert("Önce giriş yapmalısın.");
-    return;
-  }
+async function resetPassword(){
 
-  const project = {
-    user_id: currentUser.id,
-    title: currentResult.title,
-    project_type: currentResult.type,
-    project_data: currentResult.data,
-    status: "completed"
-  };
+ if(!currentUser || !db)return;
 
-  try {
-    const { error } = await db
-      .from("projects")
-      .insert([project]);
+ try{
 
-    if (error) throw error;
+  const {error}=await db.auth.resetPasswordForEmail(
+   currentUser.email,
+   {
+    redirectTo:window.location.origin
+   }
+  );
 
-    alert("Projen başarıyla kaydedildi.");
-    await loadProjects();
+  if(error)throw error;
 
-  } catch (error) {
-    console.error(error);
-    alert("Proje kaydedilemedi: " + error.message);
-  }
+  alert("Şifre sıfırlama bağlantısı e-posta adresine gönderildi.");
+
+ }catch(error){
+
+  alert("İşlem başarısız: "+error.message);
+
+ }
+
 }
 
-/* =====================================
-   PROJELERİ YÜKLE
-===================================== */
+    </script>
+    <script>
 
-async function loadProjects() {
-  if (!currentUser) return;
+// =====================================
+// SAYFA GÜVENLİĞİ
+// =====================================
 
-  const list = document.getElementById("projectsList");
+function protectPage(){
 
-  try {
-    const { data, error } = await db
-      .from("projects")
-      .select("*")
-      .eq("user_id", currentUser.id)
-      .order("created_at", { ascending: false });
+ if(!currentUser){
 
-    if (error) throw error;
+  document.getElementById("appScreen")
+  .classList.add("hidden");
 
-    projects = data || [];
+  document.getElementById("authScreen")
+  .classList.remove("hidden");
 
-    if (projects.length === 0) {
-      list.innerHTML = "<p>Henüz kayıtlı projen bulunmuyor.</p>";
-      return;
-    }
+ }
 
-    list.innerHTML = "";
-
-    projects.forEach(project => {
-      const item = document.createElement("div");
-      item.className = "project-item";
-
-      const heading = document.createElement("h3");
-      heading.textContent = project.title || "İsimsiz proje";
-
-      const info = document.createElement("p");
-      info.textContent =
-        (project.project_type || "Proje") +
-        " • " +
-        new Date(project.created_at).toLocaleDateString("tr-TR");
-
-      const viewButton = document.createElement("button");
-      viewButton.className = "secondary-btn";
-      viewButton.textContent = "Görüntüle";
-      viewButton.style.marginTop = "10px";
-      viewButton.onclick = () => viewProject(project);
-
-      const deleteButton = document.createElement("button");
-      deleteButton.className = "danger-btn";
-      deleteButton.textContent = "Sil";
-      deleteButton.style.marginTop = "10px";
-      deleteButton.style.marginLeft = "8px";
-      deleteButton.onclick = () => deleteProject(project.id);
-
-      item.appendChild(heading);
-      item.appendChild(info);
-      item.appendChild(viewButton);
-      item.appendChild(deleteButton);
-
-      list.appendChild(item);
-    });
-
-  } catch (error) {
-    console.error(error);
-    list.textContent =
-      "Projeler yüklenemedi. Supabase projects tablosunu kontrol et.";
-  }
 }
 
-/* =====================================
-   PROJEYİ GÖRÜNTÜLE
-===================================== */
+// =====================================
+// KREDİ GÖRÜNTÜLEME GÜNCELLE
+// =====================================
 
-function viewProject(project) {
-  const data = project.project_data || {};
+function refreshAccount(){
 
-  document.getElementById("toolTitle").textContent =
-    project.title || "Proje";
+ const credit=document.getElementById("creditCount");
 
-  document.getElementById("projectTitle").value =
-    project.title || "";
+ if(credit){
 
-  document.getElementById("projectDescription").value =
-    data.description || "";
+  credit.textContent=currentCredits;
 
-  document.getElementById("projectStyle").value =
-    data.style || "Serbest";
+ }
 
-  currentTool = project.project_type || "music";
+ const accountCredit=
+ document.getElementById("accountCredits");
 
-  currentResult = {
-    title: project.title,
-    type: currentTool,
-    data: data
-  };
+ if(accountCredit){
 
-  document.getElementById("resultText").textContent =
-    data.prompt || "Bu projede görüntülenecek prompt bulunamadı.";
+  accountCredit.textContent=currentCredits;
 
-  hidePanels();
+ }
 
-  document.getElementById("toolPanel").classList.remove("hidden");
-  document.getElementById("resultArea").classList.remove("hidden");
-
-  document.getElementById("toolPanel").scrollIntoView({
-    behavior: "smooth"
-  });
 }
 
-/* =====================================
-   PROJEYİ SİL
-===================================== */
+// =====================================
+// SUPABASE OTURUM DEĞİŞİKLİKLERİ
+// =====================================
 
-async function deleteProject(id) {
-  if (!confirm("Bu projeyi silmek istediğine emin misin?")) {
-    return;
+function listenAuthChanges(){
+
+ if(!db)return;
+
+ db.auth.onAuthStateChange(
+  async(event,session)=>{
+
+   if(event==="SIGNED_OUT"){
+
+    currentUser=null;
+
+    document.getElementById("appScreen")
+    .classList.add("hidden");
+
+    document.getElementById("authScreen")
+    .classList.remove("hidden");
+
+   }
+
+   if(event==="SIGNED_IN" && session){
+
+    currentUser=session.user;
+
+   }
+
   }
+ );
 
-  try {
-    const { error } = await db
-      .from("projects")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", currentUser.id);
-
-    if (error) throw error;
-
-    alert("Proje silindi.");
-    await loadProjects();
-
-  } catch (error) {
-    alert("Proje silinemedi: " + error.message);
-  }
 }
 
-/* =====================================
-   OTURUM DEĞİŞİKLİKLERİ
-===================================== */
+// =====================================
+// HATA KONTROLÜ
+// =====================================
 
-db.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN" && session) {
-    showApp(session.user);
-  }
+window.addEventListener(
+ "error",
+ function(event){
 
-  if (event === "SIGNED_OUT") {
-    currentUser = null;
+  console.error(
+   "SESMOD AI STUDIO hata:",
+   event.message
+  );
 
-    document.getElementById("appScreen").classList.add("hidden");
-    document.getElementById("appHeader").classList.add("hidden");
-    document.getElementById("authScreen").classList.remove("hidden");
-  }
-});
+ }
+);
 
-/* =====================================
-   UYGULAMAYI BAŞLAT
-===================================== */
+// =====================================
+// UYGULAMA BİLGİSİ
+// =====================================
 
-checkSession();
+const SESMOD_APP={
+
+ name:"SESMOD AI STUDIO",
+
+ version:"1.0.0",
+
+ year:2026,
+
+ developer:"SESMOD Office",
+
+};
+
+// =====================================
+// BAŞLANGIÇ KONTROLÜ
+// =====================================
+
+window.addEventListener(
+ "load",
+ function(){
+
+  console.log(
+   "SESMOD AI STUDIO başlatıldı."
+  );
+
+  console.log(
+   "Sürüm:",
+   SESMOD_APP.version
+  );
+
+  listenAuthChanges();
+
+  refreshAccount();
+
+ }
+);
 
 </script>
+
 </body>
 </html>
