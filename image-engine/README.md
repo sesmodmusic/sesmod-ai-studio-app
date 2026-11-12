@@ -28,13 +28,13 @@ os.environ["SESMOD_IMAGE_API_KEY"] = secrets.token_urlsafe(32)
 os.environ["SESMOD_ALLOWED_ORIGINS"] = "https://sesmodmusic.github.io"
 ```
 
-Then run from a checkout of this repository:
+Clone the repository, then start the API from the image-engine folder:
 
 ```bash
-uvicorn image-engine.app:app --host 0.0.0.0 --port 7861
+!git clone https://github.com/sesmodmusic/sesmod-ai-studio-app.git
+%cd /kaggle/working/sesmod-ai-studio-app/image-engine
+!uvicorn app:app --host 0.0.0.0 --port 7861
 ```
-
-For Kaggle, clone the repository and run from its root, or change into the `image-engine` folder and run `uvicorn app:app --host 0.0.0.0 --port 7861`.
 
 ## API
 
