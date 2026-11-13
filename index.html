@@ -1478,120 +1478,181 @@ function renderImagePage(){
  const page=document.getElementById("imagePage");
 
  page.innerHTML=`
-
  <div class="panel">
+  <h2>🎨 SESMOD AI Görsel Atölyesi</h2>
+  <p>Hayalindeki görseli tarif et. Stilini ve kadrajını seç, gerçek görselini üret.</p>
 
-  <h2>🎨 AI Görsel Stüdyosu</h2>
-
-  <p>Kapak, poster ve sosyal medya görselleri için prompt hazırla.</p>
-
-  <label>Görsel başlığı</label>
-
-  <input id="imageTitle" placeholder="Örneğin: Yüreğimde Kaldın">
-
-  <label>Görsel türü</label>
-
-  <select id="imageType">
-   <option>Şarkı Kapak Görseli</option>
-   <option>YouTube Thumbnail</option>
-   <option>Instagram Posteri</option>
-   <option>Sinema Posteri</option>
-   <option>Albüm Kapağı</option>
-   <option>Sanatsal Görsel</option>
-  </select>
+  <label>Görsel başlığı (isteğe bağlı)</label>
+  <input id="imageTitle" maxlength="100" placeholder="Örn: Yüreğimde Kaldın kapak görseli">
 
   <label>Görsel açıklaması</label>
+  <textarea id="imageDescription" maxlength="2000" placeholder="Nasıl bir görsel istiyorsun? Örn: Yağmur sonrası neon ışıklarla aydınlanan İstanbul sokağında, yalnız yürüyen bir kadın..."></textarea>
 
-  <textarea id="imageDescription" placeholder="Nasıl bir görsel istiyorsun?"></textarea>
-
-  <label>Görsel tarzı</label>
-
+  <label>Stil</label>
   <select id="imageStyle">
-   <option>Gerçekçi sinematik</option>
-   <option>Modern ve lüks</option>
-   <option>Minimalist</option>
-   <option>Dramatik ve karanlık</option>
-   <option>Romantik</option>
-   <option>Vintage</option>
-   <option>Sanatsal</option>
+   <option value="cinematic">Sinematik</option>
+   <option value="editorial">Editoryal</option>
+   <option value="film">Analog film</option>
+   <option value="hyperreal">Hipergerçekçi</option>
+   <option value="watercolor">Suluboya</option>
+   <option value="render3d">3B render</option>
+   <option value="neon">Neon</option>
+   <option value="minimal">Minimal</option>
   </select>
 
-  <button class="btn" onclick="generateImagePrompt()">
-   Görsel Promptu Oluştur
-  </button>
+  <label>Kadraj</label>
+  <select id="imageComposition">
+   <option value="medium">Orta plan</option>
+   <option value="close-up">Yakın plan</option>
+   <option value="wide">Geniş açı</option>
+   <option value="bird-eye">Kuş bakışı</option>
+   <option value="low-angle">Alt açı</option>
+   <option value="symmetry">Simetrik</option>
+  </select>
 
-  <div id="imageResult" class="section"></div>
+  <label>Görsel oranı</label>
+  <select id="imageRatio">
+   <option value="1:1">1:1 Kare · Albüm kapağı</option>
+   <option value="16:9">16:9 Yatay · YouTube</option>
+   <option value="9:16">9:16 Dikey · Shorts / Reels</option>
+   <option value="4:5">4:5 Dikey · Instagram</option>
+   <option value="3:2">3:2 Yatay</option>
+   <option value="2:3">2:3 Dikey</option>
+   <option value="5:4">5:4 Yatay</option>
+   <option value="21:9">21:9 Sinematik</option>
+   <option value="9:21">9:21 Uzun dikey</option>
+  </select>
 
+  <div class="action-row">
+   <button class="btn" id="generateImageButton" onclick="generateRealImage()">✦ Görsel Üret · 5 Kredi</button>
+  </div>
+  <p class="status">Üretim, Stability AI servisinden yapılır. Her başarılı görsel üretimi 5 SESMOD kredisi kullanır.</p>
+  <div id="imageResult" class="section" aria-live="polite"></div>
  </div>
-
+ <div class="panel section">
+  <h2>Son Üretilen Görsel</h2>
+  <p>Bu oturumda oluşturduğun görsel burada görüntülenir.</p>
+  <div id="generatedImageGallery" class="section"><p>Henüz görsel üretilmedi.</p></div>
+ </div>
  `;
-
 }
 
 // =====================================
 // GÖRSEL PROMPT OLUŞTUR
 // =====================================
 
-function generateImagePrompt(){
+let lastGeneratedImageUrl = "";
+let lastGeneratedImagePrompt = "";
+let lastGeneratedImageTitle = "";
 
- const title=document.getElementById("imageTitle").value.trim();
+async function generateRealImage(){
 
- const type=document.getElementById("imageType").value;
+ const description = document.getElementById("imageDescription").value.trim();
+ const title = document.getElementById("imageTitle").value.trim();
+ const style = document.getElementById("imageStyle").value;
+ const composition = document.getElementById("imageComposition").value;
+ const aspectRatio = document.getElementById("imageRatio").value;
+ const result = document.getElementById("imageResult");
+ const button = document.getElementById("generateImageButton");
 
- const description=document.getElementById("imageDescription").value.trim();
-
- const style=document.getElementById("imageStyle").value;
-
- if(!title || !description){
-
-  alert("Başlık ve görsel açıklaması gerekli.");
-
+ if(!currentUser || !db){
+  alert("Görsel üretmek için önce SESMOD hesabına giriş yapmalısın.");
   return;
-
  }
 
- const prompt=`
+ if(description.length < 3){
+  alert("Lütfen en az 3 karakterlik bir görsel açıklaması yaz.");
+  return;
+ }
 
-Create a professional ${type}.
+ if(description.length > 2000){
+  alert("Görsel açıklaması en fazla 2000 karakter olabilir.");
+  return;
+ }
 
-TITLE: ${title}
+ const prompt = title ? title + ". " + description : description;
 
-DESCRIPTION: ${description}
+ button.disabled = true;
+ button.textContent = "Görsel üretiliyor...";
+ result.innerHTML = "<p class='status'>Görsel hazırlanıyor. Bu işlem biraz zaman alabilir. Lütfen sayfayı kapatma.</p>";
 
-VISUAL STYLE: ${style}
+ try{
+  const {data,error} = await db.functions.invoke("sesmod-generate",{
+   body:{
+    prompt:prompt,
+    style:style,
+    composition:composition,
+    aspect_ratio:aspectRatio
+   }
+  });
 
-High quality detailed composition.
-Professional lighting.
-Cinematic atmosphere.
-Carefully balanced colors.
-Sharp details.
-Professional commercial design.
-No watermark.
-No unnecessary text.
-High resolution.
+  if(error){
+   let message = error.message || "Görsel üretim isteği başarısız oldu.";
+   if(error.context && typeof error.context.json === "function"){
+    try{
+     const detail = await error.context.json();
+     if(detail && detail.error) message = detail.error;
+    }catch(parseError){}
+   }
+   throw new Error(message);
+  }
 
-`;
+  if(!data || data.success !== true || !data.image_url){
+   throw new Error(data && data.error ? data.error : "Sunucudan geçerli görsel yanıtı alınamadı.");
+  }
 
- document.getElementById("imageResult").innerHTML=`
+  lastGeneratedImageUrl = data.image_url;
+  lastGeneratedImagePrompt = prompt;
+  lastGeneratedImageTitle = title || "SESMOD AI Görseli";
 
- <h3>Hazırlanan Görsel Promptu</h3>
+  if(typeof data.remaining_credits === "number"){
+   currentCredits = data.remaining_credits;
+   refreshAccount();
+  }
 
- <textarea id="imagePromptOutput">${escapeHTML(prompt)}</textarea>
+  const gallery = document.getElementById("generatedImageGallery");
+  if(gallery){
+   gallery.innerHTML =
+    "<div class='card'>" +
+    "<img src='" + escapeHTML(data.image_url) + "' alt='SESMOD tarafından oluşturulan görsel' style='display:block;width:100%;height:auto;border-radius:12px;margin-bottom:12px' loading='lazy'>" +
+    "<p>" + escapeHTML(lastGeneratedImageTitle) + "</p>" +
+    "<div class='action-row'>" +
+    "<button class='btn btn-secondary' onclick='downloadGeneratedImage()'>Görseli Aç</button>" +
+    "<button class='btn btn-secondary' onclick='saveGeneratedImageProject()'>Projelerime Kaydet</button>" +
+    "</div></div>";
+  }
 
- <div class="action-row">
+  result.innerHTML =
+   "<p class='status'>✓ Görsel başarıyla oluşturuldu. 5 kredi kullanıldı. Kalan kredi: " +
+   escapeHTML(String(data.remaining_credits)) + "</p>";
 
-  <button class="btn" onclick="copyText('imagePromptOutput')">
-   Kopyala
-  </button>
+ }catch(error){
+  console.error("SESMOD image generation:",error);
+  result.innerHTML = "<p class='status' style='color:#ff9aa9'>Görsel üretilemedi: " +
+   escapeHTML(error.message || "Bilinmeyen hata") + "</p>";
+ }finally{
+  button.disabled = false;
+  button.textContent = "✦ Görsel Üret · 5 Kredi";
+ }
+}
 
-  <button class="btn btn-secondary" onclick="saveProject('Görsel Promptu','imagePromptOutput')">
-   Projeye Kaydet
-  </button>
+function downloadGeneratedImage(){
+ if(!lastGeneratedImageUrl){
+  alert("Önce bir görsel üretmelisin.");
+  return;
+ }
+ window.open(lastGeneratedImageUrl,"_blank","noopener");
+}
 
- </div>
-
- `;
-
+async function saveGeneratedImageProject(){
+ if(!lastGeneratedImageUrl){
+  alert("Kaydedilecek görsel bulunamadı.");
+  return;
+ }
+ const content =
+  "Görsel bağlantısı: " + lastGeneratedImageUrl +
+  "\\n\\nPrompt: " + lastGeneratedImagePrompt;
+ await saveProjectData(lastGeneratedImageTitle,"image",content);
 }
 
 // =====================================
