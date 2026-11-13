@@ -584,6 +584,11 @@ footer{color:#666b80;letter-spacing:1px}
   </button>
 
   <button
+  onclick="showPage('gallery',this)">
+   Galeri
+  </button>
+
+  <button
   onclick="showPage('video',this)">
    Video
   </button>
@@ -683,6 +688,8 @@ footer{color:#666b80;letter-spacing:1px}
  <div id="lyricsPage" class="page hidden"></div>
 
  <div id="imagePage" class="page hidden"></div>
+
+ <div id="galleryPage" class="page hidden"></div>
 
  <div id="videoPage" class="page hidden"></div>
 
@@ -1012,6 +1019,8 @@ async function openApplication(user){
 
  renderImagePage();
 
+ renderGalleryPage();
+
  renderVideoPage();
 
  renderProjectsPage();
@@ -1104,9 +1113,10 @@ function showPage(page,button){
    "music",
    "lyrics",
    "image",
-   "video",
-   "projects",
-   "account"
+    "gallery",
+    "video",
+    "projects",
+    "account"
   ];
 
   const index=pages.indexOf(page);
@@ -1605,6 +1615,16 @@ async function generateRealImage(){
   lastGeneratedImagePrompt = prompt;
   lastGeneratedImageTitle = title || "SESMOD AI Görseli";
 
+  const gallerySave = await saveImageToGallery({
+   title:lastGeneratedImageTitle,
+   prompt:prompt,
+   image_url:data.image_url,
+   style:style,
+   composition:composition,
+   aspect_ratio:aspectRatio,
+   storage_path:data.storage_path || null
+  });
+
   if(typeof data.remaining_credits === "number"){
    currentCredits = data.remaining_credits;
    refreshAccount();
@@ -1624,7 +1644,9 @@ async function generateRealImage(){
 
   result.innerHTML =
    "<p class='status'>✓ Görsel başarıyla oluşturuldu. 5 kredi kullanıldı. Kalan kredi: " +
-   escapeHTML(String(data.remaining_credits)) + "</p>";
+   escapeHTML(String(data.remaining_credits)) +
+   (gallerySave ? " · Galeriye kaydedildi." : " · Galeri kaydı başarısız oldu; Galeri sayfasından yenileyebilirsin.") +
+   "</p>";
 
  }catch(error){
   console.error("SESMOD image generation:",error);
@@ -1653,6 +1675,116 @@ async function saveGeneratedImageProject(){
   "Görsel bağlantısı: " + lastGeneratedImageUrl +
   "\\n\\nPrompt: " + lastGeneratedImagePrompt;
  await saveProjectData(lastGeneratedImageTitle,"image",content);
+}
+
+
+// =====================================
+// KALICI GALERİ
+// =====================================
+
+async function saveImageToGallery(image){
+ if(!currentUser || !db)return false;
+ try{
+  const {error}=await db.from("gallery_images").insert({
+   user_id:currentUser.id,
+   title:image.title,
+   prompt:image.prompt,
+   image_url:image.image_url,
+   storage_path:image.storage_path,
+   style:image.style,
+   composition:image.composition,
+   aspect_ratio:image.aspect_ratio
+  });
+  if(error)throw error;
+  return true;
+ }catch(error){
+  console.error("Galeri kayıt hatası:",error);
+  return false;
+ }
+}
+
+function renderGalleryPage(){
+ const page=document.getElementById("galleryPage");
+ if(!page)return;
+ page.innerHTML=`
+  <div class="panel">
+   <div class="section-header">
+    <h2>🖼️ Galerim</h2>
+    <button class="btn btn-secondary" onclick="loadGalleryImages()">Yenile</button>
+   </div>
+   <p>Ürettiğin görseller hesabında saklanır. Sayfayı yenilesen veya tekrar giriş yapsan da burada kalır.</p>
+   <div id="galleryImagesList" class="section"><p>Görseller yükleniyor...</p></div>
+  </div>
+ `;
+ loadGalleryImages();
+}
+
+async function loadGalleryImages(){
+ const list=document.getElementById("galleryImagesList");
+ if(!list || !currentUser || !db)return;
+ list.innerHTML="<p>Galeri yükleniyor...</p>";
+ try{
+  const {data,error}=await db.from("gallery_images")
+   .select("id,title,prompt,image_url,style,composition,aspect_ratio,created_at")
+   .eq("user_id",currentUser.id)
+   .order("created_at",{ascending:false});
+  if(error)throw error;
+  if(!data || data.length===0){
+   list.innerHTML="<div class='card'><p>Henüz galerinde görsel yok. İlk görselini Görsel bölümünden oluşturabilirsin.</p></div>";
+   return;
+  }
+  list.innerHTML="";
+  data.forEach(item=>{
+   const card=document.createElement("div");
+   card.className="card";
+   card.style.marginBottom="16px";
+   const img=document.createElement("img");
+   img.src=item.image_url;
+   img.alt=item.title || "SESMOD AI görseli";
+   img.loading="lazy";
+   img.style.cssText="display:block;width:100%;height:auto;max-height:520px;object-fit:contain;border-radius:12px;margin-bottom:12px";
+   const title=document.createElement("h3");
+   title.textContent=item.title || "SESMOD AI Görseli";
+   const meta=document.createElement("p");
+   const date=item.created_at ? new Date(item.created_at).toLocaleString("tr-TR") : "";
+   meta.textContent=[item.style,item.composition,item.aspect_ratio,date].filter(Boolean).join(" · ");
+   const prompt=document.createElement("p");
+   prompt.style.marginTop="8px";
+   prompt.textContent=item.prompt || "";
+   const actions=document.createElement("div");
+   actions.className="action-row";
+   const open=document.createElement("button");
+   open.className="btn btn-secondary";
+   open.textContent="Görseli Aç";
+   open.onclick=()=>window.open(item.image_url,"_blank","noopener");
+   const save=document.createElement("button");
+   save.className="btn btn-secondary";
+   save.textContent="Projelerime Kaydet";
+   save.onclick=()=>saveProjectData(item.title || "SESMOD AI Görseli","image","Görsel bağlantısı: "+item.image_url+"\n\nPrompt: "+(item.prompt || ""));
+   const remove=document.createElement("button");
+   remove.className="btn btn-danger";
+   remove.textContent="Galeriden Sil";
+   remove.onclick=()=>deleteGalleryImage(item.id);
+   actions.append(open,save,remove);
+   card.append(img,title,meta,prompt,actions);
+   list.appendChild(card);
+  });
+ }catch(error){
+  console.error("Galeri yükleme hatası:",error);
+  list.innerHTML="<p>Galeri yüklenemedi: "+escapeHTML(error.message || "Bilinmeyen hata")+"</p>";
+ }
+}
+
+async function deleteGalleryImage(id){
+ if(!confirm("Bu görseli galerinden silmek istediğine emin misin?"))return;
+ try{
+  const {error}=await db.from("gallery_images").delete()
+   .eq("id",id).eq("user_id",currentUser.id);
+  if(error)throw error;
+  await loadGalleryImages();
+ }catch(error){
+  alert("Görsel silinemedi: "+error.message);
+ }
 }
 
 // =====================================
